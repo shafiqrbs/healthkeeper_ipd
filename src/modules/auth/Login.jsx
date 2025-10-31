@@ -20,7 +20,7 @@ import { getHotkeyHandler, useHotkeys } from "@mantine/hooks";
 import { IconInfoCircle, IconLogin, IconArrowLeft } from "@tabler/icons-react";
 import { isNotEmpty, useForm } from "@mantine/form";
 import { Navigate, useNavigate } from "react-router-dom";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import commonDataStoreIntoLocalStorage from "@hooks/local-storage/useCommonDataStoreIntoLocalStorage.js";
@@ -44,6 +44,18 @@ export default function Login() {
 			password: isNotEmpty(),
 		},
 	});
+
+	useHotkeys(
+		[
+			[
+				"alt+n",
+				() => {
+					document.getElementById("Username").focus();
+				},
+			],
+		],
+		[]
+	);
 
 	if (user?.id) {
 		console.info("Already logged in, redirecting from login page.");
@@ -83,18 +95,6 @@ export default function Login() {
 			});
 	}
 
-	useHotkeys(
-		[
-			[
-				"alt+n",
-				() => {
-					document.getElementById("Username").focus();
-				},
-			],
-		],
-		[]
-	);
-
 	return (
 		<div className={classes.wrapper}>
 			<Box component="form" onSubmit={form.onSubmit((values) => login(values))}>
@@ -132,7 +132,7 @@ export default function Login() {
 							onKeyDown={getHotkeyHandler([
 								[
 									"Enter",
-									(e) => {
+									() => {
 										document.getElementById("Password").focus();
 									},
 								],
@@ -162,7 +162,7 @@ export default function Login() {
 							onKeyDown={getHotkeyHandler([
 								[
 									"Enter",
-									(e) => {
+									() => {
 										document.getElementById("LoginSubmit").click();
 									},
 								],
