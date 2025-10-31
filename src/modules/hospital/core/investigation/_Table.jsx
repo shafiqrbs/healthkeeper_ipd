@@ -1,0 +1,461 @@
+import {Group, Box, ActionIcon, Text, rem, Flex, Button, TextInput, NumberInput, Checkbox, Select} from "@mantine/core";
+import { useTranslation } from "react-i18next";
+import {
+	IconTrashX,
+	IconAlertCircle,
+	IconEdit,
+	IconEye,
+	IconChevronUp,
+	IconSelector,
+} from "@tabler/icons-react";
+import { DataTable } from "mantine-datatable";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams, useNavigate, useOutletContext } from "react-router-dom";
+import { modals } from "@mantine/modals";
+import KeywordSearch from "@modules/filter/KeywordSearch";
+import ViewDrawer from "./__ViewDrawer";
+import { notifications } from "@mantine/notifications";
+import { useOs, useHotkeys } from "@mantine/hooks";
+import CreateButton from "@components/buttons/CreateButton";
+import DataTableFooter from "@components/tables/DataTableFooter";
+import { MASTER_DATA_ROUTES } from "@/constants/routes";
+import tableCss from "@assets/css/TableAdmin.module.css";
+import inlineInputCss from "@assets/css/InlineInputField.module.css";
+import {
+	deleteEntityData,
+	editEntityData, storeEntityData, updateEntityData,
+} from "@/app/store/core/crudThunk";
+import {
+	setInsertType,
+	setRefetchData,
+} from "@/app/store/core/crudSlice.js";
+import {
+	ERROR_NOTIFICATION_COLOR,
+} from "@/constants/index.js";
+import { deleteNotification } from "@components/notification/deleteNotification";
+import React, {useEffect, useState} from "react";
+import useInfiniteTableScroll from "@hooks/useInfiniteTableScroll.js";
+import {successNotification} from "@components/notification/successNotification";
+import {SUCCESS_NOTIFICATION_COLOR} from "@/constants/index";
+import {errorNotification} from "@components/notification/errorNotification";
+import {useForm} from "@mantine/form";
+import useGlobalDropdownData from "@hooks/dropdown/useGlobalDropdownData";
+import {HOSPITAL_DROPDOWNS} from "@/app/store/core/utilitySlice";
+
+const PER_PAGE = 50;
+
+export default function _Table({ module, open }) {
+	const { t } = useTranslation();
+	const os = useOs();
+	const dispatch = useDispatch();
+	const { mainAreaHeight } = useOutletContext();
+	const navigate = useNavigate();
+	const { id } = useParams();
+	const height = mainAreaHeight - 78;
+	const [submitFormData, setSubmitFormData] = useState({});
+	const [updatingRows, setUpdatingRows] = useState({});
+	const searchKeyword = useSelector((state) => state.crud.searchKeyword);
+	const filterData = useSelector((state) => state.crud[module].filterData);
+	const listData = useSelector((state) => state.crud[module].data);
+
+	// for infinity table data scroll, call the hook
+	const {
+		scrollRef,
+		records,
+		fetching,
+		sortStatus,
+		setSortStatus,
+		handleScrollToBottom,
+	} = useInfiniteTableScroll({
+		module,
+		fetchUrl: MASTER_DATA_ROUTES.API_ROUTES.INVESTIGATION.INDEX,
+		filterParams: {
+			name: filterData?.name,
+			particular_type: 'investigation',
+			term: searchKeyword,
+		},
+		perPage: PER_PAGE,
+		sortByKey: "name",
+	});
+
+	const [viewDrawer, setViewDrawer] = useState(false);
+
+	const handleEntityEdit = (id) => {
+		dispatch(setInsertType({ insertType: "update", module }));
+		dispatch(
+			editEntityData({
+				url: `${MASTER_DATA_ROUTES.API_ROUTES.INVESTIGATION.VIEW}/${id}`,
+				module,
+			})
+		);
+		navigate(`${MASTER_DATA_ROUTES.NAVIGATION_LINKS.INVESTIGATION.INDEX}/${id}`);
+	};
+
+	const { data: getInvestigationGroups } = useGlobalDropdownData({
+		path: HOSPITAL_DROPDOWNS.PARTICULAR_INVESTIGATION_GROUP.PATH,
+		params: { "dropdown-type": HOSPITAL_DROPDOWNS.PARTICULAR_INVESTIGATION_GROUP.TYPE },
+		utility: HOSPITAL_DROPDOWNS.PARTICULAR_INVESTIGATION_GROUP.UTILITY,
+	});
+
+	const handleDelete = (id) => {
+		modals.openConfirmModal({
+			title: <Text size="md">{t("FormConfirmationTitle")}</Text>,
+			children: <Text size="sm">{t("FormConfirmationMessage")}</Text>,
+			labels: { confirm: "Confirm", cancel: "Cancel" },
+			confirmProps: { color: "var(--theme-delete-color)" },
+			onCancel: () => console.info("Cancel"),
+			onConfirm: () => handleDeleteSuccess(id),
+		});
+	};
+
+	const handleDeleteSuccess = async (id) => {
+		const res = await dispatch(
+			deleteEntityData({
+				url: `${MASTER_DATA_ROUTES.API_ROUTES.INVESTIGATION.DELETE}/${id}`,
+				module,
+				id,
+			})
+		);
+
+		if (deleteEntityData.fulfilled.match(res)) {
+			dispatch(setRefetchData({ module, refetching: true }));
+			deleteNotification(t("DeletedSuccessfully"), ERROR_NOTIFICATION_COLOR);
+			navigate(MASTER_DATA_ROUTES.NAVIGATION_LINKS.BED);
+			dispatch(setInsertType({ insertType: "create", module }));
+		} else {
+			notifications.show({
+				color: ERROR_NOTIFICATION_COLOR,
+				title: t("Delete Failed"),
+				icon: <IconAlertCircle style={{ width: rem(18), height: rem(18) }} />,
+			});
+		}
+	};
+
+	const handleDataShow = (id) => {
+		dispatch(
+			editEntityData({
+				url: `${MASTER_DATA_ROUTES.API_ROUTES.INVESTIGATION.VIEW}/${id}`,
+				module,
+			})
+		);
+		setViewDrawer(true);
+	};
+
+	const handleReportFormatTable = (id) => {
+		dispatch(
+			editEntityData({
+				url: `${MASTER_DATA_ROUTES.API_ROUTES.INVESTIGATION.VIEW}/${id}`,
+				module,
+			})
+		);
+		navigate(`${MASTER_DATA_ROUTES.NAVIGATION_LINKS.INVESTIGATION.REPORT_FORMAT}/${id}`);
+	};
+
+	const handleCreateForm = () => {
+		open();
+		dispatch(setInsertType({ insertType: "create", module }));
+		navigate(MASTER_DATA_ROUTES.NAVIGATION_LINKS.INVESTIGATION.INDEX);
+	};
+
+	const form = useForm({
+		initialValues: {
+			price: 0,
+		}
+	});
+
+	useEffect(() => {
+		if (!records?.length) return;
+		const initialFormData = records.reduce((acc, item) => {
+			acc[item.id] = {
+				name: item.name || "",
+				price: item.price?.toString() || 0,
+				is_available: item?.is_available ?? false,
+				report_format: item?.report_format ?? false,
+				investigation_group_id: item.investigation_group_id?.toString() ?? "",
+			};
+
+			return acc;
+		}, {});
+
+		setSubmitFormData(initialFormData);
+	}, [records]);
+
+
+	const handleDataTypeChange = (rowId, field, value, submitNow = false) => {
+		const updatedRow = {
+			...submitFormData[rowId],
+			[field]: value,
+		};
+
+		setSubmitFormData(prev => ({
+			...prev,
+			[rowId]: updatedRow,
+		}));
+
+		// optional immediate submit (for Select)
+		if (submitNow) {
+			handleRowSubmit(rowId, updatedRow);
+		}
+	};
+
+	const handleRowSubmit = async (rowId) => {
+		const formData = submitFormData[rowId];
+		if (!formData) return false;
+
+		// 🔎 find original row data
+		const originalRow = records.find((r) => r.id === rowId);
+		if (!originalRow) return false;
+
+		// ✅ check if there is any change
+		const isChanged = Object.keys(formData).some(
+			(key) => formData[key] !== originalRow[key]
+		);
+
+		if (!isChanged) {
+			// nothing changed → do not submit
+			return false;
+		}
+
+		const value = {
+			url: `${MASTER_DATA_ROUTES.API_ROUTES.PARTICULAR.INLINE_UPDATE}/${rowId}`,
+			data: formData,
+			module,
+		};
+		try {
+			const resultAction = await dispatch(storeEntityData(value));
+		} catch (error) {
+			errorNotification(error.message);
+		}
+	};
+
+	useHotkeys([[os === "macos" ? "ctrl+n" : "alt+n", () => handleCreateForm()]]);
+
+	return (
+		<>
+			<Box p="xs" className="boxBackground borderRadiusAll border-bottom-none ">
+				<Flex align="center" justify="space-between" gap={4}>
+					<KeywordSearch module={module} />
+					<CreateButton handleModal={handleCreateForm} text="AddNew" />
+				</Flex>
+			</Box>
+
+			<Box className="borderRadiusAll border-top-none">
+				<DataTable
+					classNames={{
+						root: tableCss.root,
+						table: tableCss.table,
+						body: tableCss.body,
+						header: tableCss.header,
+						footer: tableCss.footer,
+						pagination: tableCss.pagination,
+					}}
+					records={records}
+					columns={[
+						{
+							accessor: "index",
+							title: t("S/N"),
+							textAlignment: "right",
+							sortable: false,
+							render: (_item, index) => index + 1,
+						},
+						{
+							accessor: "category",
+							title: t("Category"),
+							textAlignment: "right",
+							sortable: true,
+							render: (item) => item.category,
+						},
+						{
+							accessor: "name",
+							title: t("Name"),
+							sortable: true,
+							render: (item) => (
+								<TextInput
+									size="xs"
+									className={inlineInputCss.inputText}
+									placeholder={t("Name")}
+									value={submitFormData[item.id]?.name || ""}
+									onChange={(event) =>
+										handleDataTypeChange(item.id, "name", event.currentTarget.value)
+									}
+									onBlur={() => handleRowSubmit(item.id)}
+								/>
+							),
+						},
+						{
+							accessor: "display_name",
+							title: t("DisplayName"),
+							sortable: true,
+							render: (values) => (
+								<Text
+									className="activate-link"
+									fz="xs"
+									onClick={() => handleDataShow(values.id)}
+								>
+									{values.display_name}
+								</Text>
+							),
+						},
+						{
+							accessor: "investigation_group_id",
+							title: t("UnitName"),
+							render: (item) => (
+								<Select
+									size="xs"
+									className={inlineInputCss.inputText}
+									placeholder={t("investigationGroupName")}
+									data={getInvestigationGroups}
+									value={submitFormData[item.id]?.investigation_group_id ?? ""}
+									onChange={(val) => {
+										handleDataTypeChange(item.id, "investigation_group_id", val,true);
+									}}
+									rightSection={updatingRows[item.id]}
+								/>
+							),
+						},
+
+						{
+							accessor: "price",
+							title: t("Price"),
+							sortable: false,
+							render: (item) => (
+								<NumberInput
+									size="xs"
+									className={inlineInputCss.inputNumber}
+									placeholder={t("Price")}
+									value={submitFormData[item.id]?.price || ""}
+									onChange={(val) => handleDataTypeChange(item.id, "price", val)}
+									onBlur={() => handleRowSubmit(item.id)}
+								/>
+							),
+						},
+						{
+							accessor: "is_available",
+							title: t("Available"),
+							render: (item) => (
+								<Checkbox
+									key={item.id}
+									size="sm"
+									checked={submitFormData[item.id]?.is_available ?? false}
+									onChange={(val) =>
+										handleDataTypeChange(
+											item.id,
+											"is_available",
+											val.currentTarget.checked,
+											true
+										)
+									}
+								/>
+							),
+						},
+						{
+							accessor: "report_format",
+							title: t("Report"),
+							render: (item) => (
+								<Checkbox
+									key={item.id}
+									size="sm"
+									checked={submitFormData[item.id]?.report_format ?? false}
+									onChange={(val) =>
+										handleDataTypeChange(
+											item.id,
+											"report_format",
+											val.currentTarget.checked,
+											true
+										)
+									}
+								/>
+							),
+						},
+
+						{
+							accessor: "action",
+							title: "",
+							textAlign: "right",
+							titleClassName: "title-right",
+							render: (values) => (
+								<Group gap={4} justify="right" wrap="nowrap">
+							<Button.Group>
+								<Button
+									onClick={() => {
+										handleEntityEdit(values.id);
+										open();
+									}}
+									variant="filled"
+									c="white"
+									fw={400}
+									size="compact-xs"
+									radius="es"
+									leftSection={<IconEdit size={12} />}
+									className="border-right-radius-none btnPrimaryBg"
+								>
+									{t("Edit")}
+								</Button>
+								<Button
+									onClick={() => handleDataShow(values.id)}
+									variant="filled"
+									c="white"
+									bg="var(--theme-primary-color-6)"
+									size="compact-xs"
+									radius="es"
+									fw={400}
+									leftSection={<IconEye size={12} />}
+									className="border-left-radius-none"
+								>
+									{t("View")}
+								</Button>
+								<Button
+									onClick={() => handleReportFormatTable(values.id)}
+									variant="filled"
+									c="white"
+									bg="var(--theme-warn-color-5)"
+									fw={400}
+									size="compact-xs"
+									radius="es"
+								>
+									{t("Format")}
+								</Button>
+								<ActionIcon
+									size="xs"
+									onClick={() => handleDelete(values.id)}
+									variant="light"
+									color="var(--theme-delete-color)"
+									radius="es"
+									aria-label="Settings"
+								>
+									<IconTrashX stroke={1.5} />
+								</ActionIcon>
+							</Button.Group>
+						</Group>
+							),
+						},
+					]}
+					textSelectionDisabled
+					fetching={fetching}
+					loaderSize="xs"
+					loaderColor="grape"
+					height={height - 72}
+					onScrollToBottom={handleScrollToBottom}
+					scrollViewportRef={scrollRef}
+					sortStatus={sortStatus}
+					onSortStatusChange={setSortStatus}
+					sortIcons={{
+						sorted: (
+							<IconChevronUp
+								color="var(--theme-tertiary-color-7)"
+								size={14}
+							/>
+						),
+						unsorted: (
+							<IconSelector color="var(--theme-tertiary-color-7)" size={14} />
+						),
+					}}
+				/>
+			</Box>
+
+			<DataTableFooter indexData={listData} module={module} />
+			<ViewDrawer viewDrawer={viewDrawer} setViewDrawer={setViewDrawer} module={module} />
+		</>
+	);
+}
+

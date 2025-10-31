@@ -1,0 +1,21 @@
+.list {
+    position: relative;
+    background-color: var(--theme-primary-color-0);
+}
+
+.indicator {
+    color: white;
+    border-radius: 4px;
+    box-shadow: var(--mantine-shadow-sm);
+}
+
+.tab {
+    z-index: 1;
+    font-weight: 500;
+    color: var(--mantine-color-gray-7);
+    border-radius: 4px;
+
+    &[data-active] {
+        color: white;
+    }
+}

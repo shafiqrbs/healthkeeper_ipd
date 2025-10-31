@@ -1,0 +1,66 @@
+[
+
+  {
+    "Group": "Doctor",
+    "actions": [
+      { "id": "doctor_opd", "label": "OPD" },
+      { "id": "doctor_emergency", "label": "Emergency" },
+      { "id": "doctor_ipd", "label": "IPD" },
+      { "id": "doctor_ipd_confirm", "label": "IPD In-charge" },
+      { "id": "doctor_lab", "label": "Lab" },
+      { "id": "lab_assistant", "label": "Lab Assistant" }
+    ]
+  },
+  {
+    "Group": "Nurse",
+    "actions": [
+      { "id": "nurse_basic", "label": "Nurse" },
+      { "id": "nurse_incharge", "label": "Nurse In-charge" }
+    ]
+  },
+  {
+    "Group": "Pharmacy",
+    "actions": [
+      { "id": "pharmacy_operator", "label": "Operator" },
+      { "id": "pharmacy_pharmacist", "label": "Pharmacist" },
+      { "id": "pharmacy_manager", "label": "Manager" }
+    ]
+  },
+  {
+    "Group": "Operator",
+    "actions": [
+      { "id": "operator_opd", "label": "OPD Operator" },
+      { "id": "operator_emergency", "label": "Emergency" },
+      { "id": "ipd_admission", "label": "IPD Admission" },
+      { "id": "operator_manager", "label": "Operator Manager" }
+    ]
+  },
+  {
+    "Group": "Billing",
+    "actions": [
+      { "id": "billing_cash", "label": "Operator" },
+      { "id": "billing_manager", "label": "Manager" }
+    ]
+  },
+  {
+    "Group": "Reports",
+    "actions": [
+      { "id": "reports_hospital", "label": "Hospital" },
+      { "id": "reports_basic", "label": "Basic Reports" },
+      { "id": "reports_advanced", "label": "Advanced Reports" }
+    ]
+  },
+  {
+    "Group": "Admin",
+    "actions": [
+      { "id": "admin_basic", "label": "Admin" },
+      { "id": "admin_hospital", "label": "Hospital" },
+      { "id": "admin_operator", "label": "Operator" },
+      { "id": "admin_doctor", "label": "Doctor" },
+      { "id": "admin_nurse", "label": "Nurse" },
+      { "id": "admin_pharmacy", "label": "Pharmacy" }
+    ]
+  }
+
+
+]
