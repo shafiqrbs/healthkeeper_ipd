@@ -249,7 +249,7 @@ export default function AddMedicineForm({ medicines, module, setMedicines }) {
 							classNames={inputCss}
 						/>
 					</Group>
-					<Grid w="100%" columns={12} gutter="xxxs">
+					<Grid w="100%" columns={12} gutter="3xs">
 						<Grid.Col span={6}>
 							<Group grow gap="les">
 								<Select

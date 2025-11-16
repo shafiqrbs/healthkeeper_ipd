@@ -84,6 +84,11 @@ export const MASTER_DATA_ROUTES = {
 			DELETE: "/hospital/core/particular/delete",
 		},
 
+		STORE_USER: {
+			INDEX: "hospital/core/store-user",
+			INLINE_UPDATE: "hospital/core/store-user/inline-update",
+		},
+
 		LAB_USER: {
 			INDEX: "hospital/core/particular",
 			CREATE: "hospital/core/particular",
@@ -155,10 +160,10 @@ export const MASTER_DATA_ROUTES = {
 
 		PARTICULAR_MODE: {
 			INDEX: "hospital/core/particular-mode",
-			CREATE: "hospital/core/particular-mode/create",
-			UPDATE: "hospital/core/particular-mode/update",
-			VIEW: "hospital/core/particular-mode/view",
-			DELETE: "hospital/core/particular-mode/delete",
+			CREATE: "hospital/core/particular-mode",
+			UPDATE: "hospital/core/particular-mode",
+			VIEW: "hospital/core/particular-mode",
+			DELETE: "hospital/core/particular-mode",
 		},
 
 		CATEGORY: {
@@ -193,6 +198,10 @@ export const MASTER_DATA_ROUTES = {
 			CREATE: "/core/store",
 			UPDATE: "/core/store",
 			VIEW: "/core/store",
+		},
+
+		STORE_USER: {
+			INDEX: "/hospital/core/store-user",
 		},
 
 		SETTING: {
@@ -327,6 +336,18 @@ export const MASTER_DATA_ROUTES = {
 
 export const PHARMACY_DATA_ROUTES = {
 	API_ROUTES: {
+		STOCK: {
+			INDEX: "pharmacy/stock",
+			STOCK_MATRIX: "pharmacy/stock-item/matrix",
+			INDEX_CATEGORY: "pharmacy/stock/category",
+			GENERIC: "pharmacy/stock/generic",
+			CREATE: "pharmacy/stock",
+			UPDATE: "pharmacy/stock",
+			VIEW: "pharmacy/stock",
+			DELETE: "pharmacy/stock",
+			INLINE_UPDATE: "pharmacy/stock/inline-update",
+		},
+
 		MEDICINE: {
 			INDEX: "pharmacy/medicine",
 			CREATE: "pharmacy/medicine",
@@ -335,26 +356,42 @@ export const PHARMACY_DATA_ROUTES = {
 			DELETE: "pharmacy/medicine",
 			INLINE_UPDATE: "pharmacy/medicine/inline-update",
 		},
+
 		REQUISITION: {
 			INDEX: "pharmacy/requisition",
-			CREATE: "pharmacy/requisition/manage",
-			UPDATE: "pharmacy/requisition/manage",
-			VIEW: "pharmacy/requisition/manage",
+			CREATE: "pharmacy/requisition",
+			UPDATE: "pharmacy/requisition",
+			VIEW: "pharmacy/requisition",
 			DELETE: "pharmacy/requisition",
 		},
-		WORKORDER: {
-			INDEX: "pharmacy/workorder",
-			CREATE: "pharmacy/workorder/manage",
-			UPDATE: "pharmacy/workorder/manage",
-			VIEW: "pharmacy/workorder/manage",
-			DELETE: "pharmacy/workorder",
-		},
+
 		PURCHASE: {
-            CREATE: "pharmacy/purchase",
+			CREATE: "pharmacy/purchase",
 			INDEX: "pharmacy/purchase",
-			// UPDATE: "pharmacy/workorder/manage",
-			// VIEW: "pharmacy/workorder/manage",
-			// DELETE: "pharmacy/workorder",
+			UPDATE: "pharmacy/purchase",
+			VIEW: "pharmacy/purchase",
+			DELETE: "pharmacy/purchase",
+			APPROVE: "pharmacy/purchase/approve",
+			RECEIVE: "pharmacy/purchase/receive",
+		},
+
+		STOCK_TRANSFER: {
+			CREATE: "pharmacy/stock-transfer",
+			INDEX: "pharmacy/stock-transfer",
+			INDEX_CENTRAL: "pharmacy/stock-transfer/central-index",
+			UPDATE: "pharmacy/stock-transfer",
+			INLINE_UPDATE: "pharmacy/stock-transfer/inline-update",
+			VIEW: "pharmacy/stock-transfer",
+			DELETE: "pharmacy/stock-transfer",
+			APPROVE: "pharmacy/stock-transfer/approve",
+			RECEIVE: "pharmacy/stock-transfer/receive",
+		},
+
+		STORE_INDENT: {
+			INDEX: "pharmacy/stock-transfer",
+			UPDATE: "pharmacy/stock-transfer",
+			VIEW: "pharmacy/stock-transfer",
+			ISSUE: "pharmacy/stock-transfer/issue",
 		},
 	},
 	NAVIGATION_LINKS: {
@@ -369,20 +406,40 @@ export const PHARMACY_DATA_ROUTES = {
 			DELETE: "/pharmacy/core/medicine",
 		},
 
+		GENERIC: {
+			INDEX: "/pharmacy/core/generic",
+			CREATE: "/pharmacy/core/generic",
+			UPDATE: "/pharmacy/core/generic",
+			VIEW: "/pharmacy/core/generic",
+			DELETE: "/pharmacy/core/generic",
+		},
+
 		STOCK: {
 			INDEX: "/pharmacy/core/stock",
+			GENERIC: "/pharmacy/core/stock/generic",
 			CREATE: "/pharmacy/core/stock",
 			UPDATE: "/pharmacy/core/stock",
 			VIEW: "/pharmacy/core/stock",
 			DELETE: "/pharmacy/core/stock",
 		},
 
+		STORE_STOCK: {
+			INDEX: "/store/stock",
+		},
+
 		REQUISITION: {
-			INDEX: "/pharmacy/requisition",
-			CREATE: "/pharmacy/requisition/manage",
-			UPDATE: "/pharmacy/requisition/manage",
-			VIEW: "/pharmacy/requisition/manage",
-			DELETE: "/pharmacy/requisition",
+			INDEX: "/store/requisition",
+			CREATE: "/store/requisition/manage",
+			UPDATE: "/store/requisition/manage",
+			VIEW: "/store/requisition/manage",
+			DELETE: "/store/requisition",
+		},
+
+		STORE_INDENT: {
+			INDEX: "/pharmacy/core/store-indent",
+			UPDATE: "/pharmacy/core/store-indent",
+			VIEW: "/pharmacy/core/store-indent",
+			ISSUE: "/pharmacy/core/store-indent/issue",
 		},
 
 		WORKORDER: {
@@ -430,7 +487,6 @@ export const HOSPITAL_DATA_ROUTES = {
 			CREATE: "hospital/opd",
 			UPDATE: "hospital/opd",
 			VITAL_UPDATE: "hospital/opd/vital-update",
-			PATIENT_WAVER: "hospital/opd/patient-waver",
 			POLICE_CASE_CREATE: "hospital/opd/police-case",
 			VIEW: "hospital/opd",
 			DELETE: "hospital/opd",
@@ -474,6 +530,18 @@ export const HOSPITAL_DATA_ROUTES = {
 			VIEW: "hospital/billing",
 			DELETE: "hospital/billing",
 		},
+
+		PATIENT_WAIVER: {
+			INDEX: "hospital/patient-waiver",
+			INVOICE: "hospital/patient-waiver/invoice",
+			CREATE: "hospital/patient-waiver",
+			UPDATE: "hospital/patient-waiver",
+			VIEW: "hospital/patient-waiver",
+			PROCESS: "hospital/patient-waiver/process",
+			APPROVE: "hospital/patient-waiver/aprove",
+			DELETE: "hospital/patient-waiver",
+		},
+
 		FINAL_BILLING: {
 			INDEX: "hospital/final-billing",
 			CREATE: "hospital/final-billing",
@@ -492,6 +560,7 @@ export const HOSPITAL_DATA_ROUTES = {
 			UPDATE: "hospital/prescription",
 			VIEW: "hospital/prescription/view",
 		},
+
 		ADMISSION: {
 			INDEX: "hospital/admission",
 			EDIT: "hospital/admission",
@@ -507,6 +576,8 @@ export const HOSPITAL_DATA_ROUTES = {
 			VIEW: "hospital/ipd",
 			TRANSACTION: "hospital/ipd/transaction",
 			PROCESS: "hospital/ipd/data-process",
+			EFRESH_ORDER: "hospital/ipd/efresh-order",
+			PATIENT_CHART: "hospital/ipd/patient-chart",
 		},
 
 		EMERGENCY: {
@@ -597,6 +668,7 @@ export const HOSPITAL_DATA_ROUTES = {
 			UPDATE: "/hospital/ipd-admitted",
 			VIEW: "/hospital/ipd-admitted",
 			IPD_PRESCRIPTION: "/hospital/ipd-admitted/prescription",
+			MANAGE: "/hospital/ipd-admitted/manage",
 		},
 		EMERGENCY: {
 			INDEX: "/hospital/emergency",
@@ -619,6 +691,13 @@ export const HOSPITAL_DATA_ROUTES = {
 			INDEX: "/hospital/free-patient",
 			UPDATE: "/hospital/free-patient",
 			VIEW: "/hospital/free-patient",
+		},
+
+		PATIENT_WAIVER: {
+			INDEX: "/hospital/patient-waiver",
+			UPDATE: "/hospital/patient-waiver",
+			PROCESS: "/hospital/patient-waiver",
+			VIEW: "/hospital/patient-waiver",
 		},
 
 		POLICE_CASE: {

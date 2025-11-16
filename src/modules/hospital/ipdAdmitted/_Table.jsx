@@ -28,12 +28,16 @@ import { getDataWithoutStore } from "@/services/apiService";
 import DetailsInvoiceBN from "@hospital-components/print-formats/billing/DetailsInvoiceBN";
 import DischargeA4BN from "@hospital-components/print-formats/discharge/DischargeA4BN";
 import { modals } from "@mantine/modals";
+import { useDisclosure } from "@mantine/hooks";
+import IpdManageDrawer from "@hospital-components/drawer/IpdManageDrawer";
+import AdmissionFormBN from "@hospital-components/print-formats/admission/AdmissionFormBN";
 
 const module = MODULES.ADMISSION;
 const PER_PAGE = 500;
 
 export default function _Table({ setSelectedPrescriptionId, ipdMode, setIpdMode }) {
 	const dischargePaperRef = useRef(null);
+	const admissionFormRef = useRef(null);
 	const prescriptionRef = useRef(null);
 	const billingInvoiceRef = useRef(null);
 	const { t } = useTranslation();
@@ -44,8 +48,9 @@ export default function _Table({ setSelectedPrescriptionId, ipdMode, setIpdMode 
 	const [printData, setPrintData] = useState(null);
 	const [billingPrintData, setBillingPrintData] = useState(null);
 	const [dischargePaperPrintData, setDischargePaperPrintData] = useState(null);
+	const [admissionFormPrintData, setAdmissionFormPrintData] = useState(null);
 	const height = mainAreaHeight - 100;
-
+	const [openedManageIpd, { open: openManageIpd, close: closeManageIpd }] = useDisclosure(false);
 	const form = useForm({
 		initialValues: {
 			keywordSearch: "",
@@ -80,6 +85,10 @@ export default function _Table({ setSelectedPrescriptionId, ipdMode, setIpdMode 
 		content: () => dischargePaperRef.current,
 	});
 
+	const printAdmissionForm = useReactToPrint({
+		content: () => admissionFormRef.current,
+	});
+
 	const handleDischargePaperPrint = async (id) => {
 		const res = await getDataWithoutStore({
 			url: `${HOSPITAL_DATA_ROUTES.API_ROUTES.IPD.INDEX}/${id}`,
@@ -98,7 +107,7 @@ export default function _Table({ setSelectedPrescriptionId, ipdMode, setIpdMode 
 
 	const handlePrescriptionPrint = async (id) => {
 		const res = await getDataWithoutStore({
-			url: `${HOSPITAL_DATA_ROUTES.API_ROUTES.PRESCRIPTION.INDEX}/${id}`,
+			url: `${HOSPITAL_DATA_ROUTES.API_ROUTES.IPD.INDEX}/${id}`,
 		});
 		setPrintData(res.data);
 		requestAnimationFrame(printPrescription);
@@ -112,16 +121,7 @@ export default function _Table({ setSelectedPrescriptionId, ipdMode, setIpdMode 
 			labels: { confirm: t("Confirm"), cancel: t("Cancel") },
 			confirmProps: { color: "red" },
 			onCancel: () => console.info("Cancel"),
-			onConfirm: () =>
-				navigate(
-					`${HOSPITAL_DATA_ROUTES.NAVIGATION_LINKS.IPD_ADMITTED.INDEX}/${prescriptionId}?tabs=true&redirect=prescription`
-				),
-			// navigate(
-			// 	`${HOSPITAL_DATA_ROUTES.NAVIGATION_LINKS.IPD_ADMITTED.INDEX}/${id}?tabs=true&redirect=prescription`,
-			// 	{
-			// 		state: { prescriptionId: prescriptionId },
-			// 	}
-			// ),
+			onConfirm: () => navigate(`${HOSPITAL_DATA_ROUTES.NAVIGATION_LINKS.IPD_ADMITTED.MANAGE}/${prescriptionId}`),
 		});
 	};
 
@@ -129,7 +129,15 @@ export default function _Table({ setSelectedPrescriptionId, ipdMode, setIpdMode 
 		navigate(HOSPITAL_DATA_ROUTES.NAVIGATION_LINKS.IPD_ADMITTED.INDEX);
 	};
 
-	const handleProcessConfirmation = async (id) => {
+	const handleAdmissionFormPrint = async (id) => {
+		const res = await getDataWithoutStore({
+			url: `${HOSPITAL_DATA_ROUTES.API_ROUTES.IPD.INDEX}/${id}`,
+		});
+		setAdmissionFormPrintData(res.data);
+		requestAnimationFrame(printAdmissionForm);
+	};
+
+	const handleProcessConfirmation = async (id, uid) => {
 		const resultAction = await dispatch(
 			showEntityData({
 				url: `${HOSPITAL_DATA_ROUTES.API_ROUTES.PRESCRIPTION.SEND_TO_PRESCRIPTION}/${id}`,
@@ -137,19 +145,10 @@ export default function _Table({ setSelectedPrescriptionId, ipdMode, setIpdMode 
 				id,
 			})
 		).unwrap();
-		const prescription_id = resultAction?.data?.data.id;
-		const isPrescribed = resultAction?.data?.data?.json_content;
-
-		if (isPrescribed) {
+		const prescription_id = resultAction?.data?.data.uid;
+		if (prescription_id) {
 			navigate(
-				`${HOSPITAL_DATA_ROUTES.NAVIGATION_LINKS.IPD_ADMITTED.INDEX}/${id}?tabs=true&redirect=prescription`,
-				{
-					state: { prescriptionId: prescription_id },
-				}
-			);
-		} else if (prescription_id) {
-			navigate(
-				`${HOSPITAL_DATA_ROUTES.NAVIGATION_LINKS.IPD_ADMITTED.IPD_PRESCRIPTION}/${prescription_id}?redirect=prescription&ipd=${id}`
+				`${HOSPITAL_DATA_ROUTES.NAVIGATION_LINKS.IPD_ADMITTED.IPD_PRESCRIPTION}/${prescription_id}?redirect=prescription&ipd=${uid}`
 			);
 		} else {
 			console.error(resultAction);
@@ -160,7 +159,7 @@ export default function _Table({ setSelectedPrescriptionId, ipdMode, setIpdMode 
 	return (
 		<Box pos="relative">
 			<Flex align="center" justify="space-between">
-				<KeywordSearch form={form} module={module} />
+				<KeywordSearch showOpdRoom showUnits form={form} module={module} />
 
 				<SegmentedControl
 					w={220}
@@ -249,7 +248,7 @@ export default function _Table({ setSelectedPrescriptionId, ipdMode, setIpdMode 
 									{ipdMode === "non-prescription" && (
 										<Button
 											rightSection={<IconArrowNarrowRight size={18} />}
-											onClick={() => handleProcessConfirmation(values.id)}
+											onClick={() => handleProcessConfirmation(values.id, values.uid)}
 											variant="filled"
 											color="var(--theme-primary-color-6)"
 											radius="xs"
@@ -257,22 +256,36 @@ export default function _Table({ setSelectedPrescriptionId, ipdMode, setIpdMode 
 											size="compact-xs"
 											fw={400}
 										>
-											{t("Process")}
+											{t("Prescription")}
 										</Button>
 									)}
 									{ipdMode === "prescription" && values.prescription_id && (
-										<Button
-											rightSection={<IconArrowNarrowRight size={18} />}
-											onClick={() => handleManageOverview(values.prescription_id, values.id)}
-											variant="filled"
-											color="var(--theme-primary-color-6)"
-											radius="xs"
-											aria-label="Settings"
-											size="compact-xs"
-											fw={400}
-										>
-											{t("E-Fresh")}
-										</Button>
+										<>
+											<Button
+												rightSection={<IconArrowNarrowRight size={18} />}
+												onClick={() => handleManageOverview(values.uid, values.id)}
+												variant="filled"
+												color="var(--theme-primary-color-6)"
+												radius="xs"
+												aria-label="Settings"
+												size="compact-xs"
+												fw={400}
+											>
+												{t("Manage")}
+											</Button>
+											{/* <Button
+												rightSection={<IconArrowNarrowRight size={18} />}
+												onClick={() => openManageIpd()}
+												variant="filled"
+												color="var(--theme-primary-color-6)"
+												radius="xs"
+												aria-label="Settings"
+												size="compact-xs"
+												fw={400}
+											>
+												{t("Instant")}
+											</Button> */}
+										</>
 									)}
 
 									<Menu
@@ -306,12 +319,26 @@ export default function _Table({ setSelectedPrescriptionId, ipdMode, setIpdMode 
 																}}
 															/>
 														}
-														onClick={() => handlePrescriptionPrint(values?.prescription_id)}
+														onClick={() => handlePrescriptionPrint(values?.uid)}
 													>
 														{t("Prescription")}
 													</Menu.Item>
 												</>
 											)}
+
+											<Menu.Item
+												leftSection={
+													<IconPrinter
+														style={{
+															width: rem(14),
+															height: rem(14),
+														}}
+													/>
+												}
+												onClick={() => handleAdmissionFormPrint(values?.id)}
+											>
+												{t("AdmissionForm")}
+											</Menu.Item>
 
 											<Menu.Item
 												leftSection={
@@ -363,6 +390,9 @@ export default function _Table({ setSelectedPrescriptionId, ipdMode, setIpdMode 
 			</Box>
 			<DataTableFooter indexData={records} module="ipd" />
 
+			<IpdManageDrawer opened={openedManageIpd} close={closeManageIpd} />
+
+			{admissionFormPrintData && <AdmissionFormBN data={admissionFormPrintData} ref={admissionFormRef} />}
 			{printData && <IPDPrescriptionFullBN data={printData} ref={prescriptionRef} />}
 			{billingPrintData && <DetailsInvoiceBN data={billingPrintData} ref={billingInvoiceRef} />}
 			{dischargePaperPrintData && <DischargeA4BN data={dischargePaperPrintData} ref={dischargePaperRef} />}

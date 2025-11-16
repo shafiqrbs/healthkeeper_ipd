@@ -6,7 +6,7 @@ export default function BasicInfoCard({ form, prescriptionData, onBlur }) {
 	const { t } = useTranslation();
 	console.log(prescriptionData);
 	return (
-		<Stack gap="xxxs" bg="var(--theme-primary-color-1)" p="xs" pb={"xxxs"} className="borderRadiusAll">
+		<Stack gap="3xs" bg="var(--theme-primary-color-1)" p="xs" pb={"3xs"} className="borderRadiusAll">
 			<Stack gap={0} ta="left">
 				<Grid w="100%" columns={24}>
 					<Grid.Col span={8} fz="xs">
@@ -28,11 +28,12 @@ export default function BasicInfoCard({ form, prescriptionData, onBlur }) {
 					</Grid.Col>
 					<Grid.Col span={8}>
 						<Text fz="xs">
-							{t("Age")}:<>
-							{(prescriptionData?.data?.day || 0) > 0 && `${prescriptionData.data.day}d `}
-							{(prescriptionData?.data?.month || 0) > 0 && `${prescriptionData.data.month}m `}
-							{(prescriptionData?.data?.year || 0) > 0 && `${prescriptionData.data.year}y`}
-						</>
+							{t("Age")}:
+							<>
+								{(prescriptionData?.data?.day || 0) > 0 && `${prescriptionData.data.day}d `}
+								{(prescriptionData?.data?.month || 0) > 0 && `${prescriptionData.data.month}m `}
+								{(prescriptionData?.data?.year || 0) > 0 && `${prescriptionData.data.year}y`}
+							</>
 						</Text>
 					</Grid.Col>
 				</Grid>
@@ -52,60 +53,50 @@ export default function BasicInfoCard({ form, prescriptionData, onBlur }) {
 			</Stack>
 			<Divider />
 			<Box bg="white">
-				<Grid w="100%" columns={24} gutter={'2'} pl={'xs'}>
+				<Grid w="100%" columns={24} gutter={"2"} pl={"xs"}>
 					<Grid.Col span={4}>
-						<Text fz="xs">
-							{t("B/P")}
-						</Text>
+						<Text fz="xs">{t("B/P")}</Text>
 					</Grid.Col>
 					<Grid.Col span={6}>
-						<Text fz="xs" pl={'xs'}>
+						<Text fz="xs" pl={"xs"}>
 							{prescriptionData?.data?.bp} {/*mm of HG*/}
 						</Text>
 					</Grid.Col>
 					<Grid.Col span={7} fz="xs" align={"right"}>
-						<Text fz="xs">
-							{t("Pulse")}
-						</Text>
+						<Text fz="xs">{t("Pulse")}</Text>
 					</Grid.Col>
-					<Grid.Col span={7} fz="xs" pl={'xs'}>
-						{prescriptionData?.data?.pulse}{/* Beat/Minute*/}
+					<Grid.Col span={7} fz="xs" pl={"xs"}>
+						{prescriptionData?.data?.pulse}
+						{/* Beat/Minute*/}
 					</Grid.Col>
 					<Grid.Col span={4}>
-						<Text fz="xs">
-							{t("SatWithO2")}
-						</Text>
+						<Text fz="xs">{t("SatWithO2")}</Text>
 					</Grid.Col>
 					<Grid.Col span={6}>
-						<Text fz="xs" pl={'xs'}>
+						<Text fz="xs" pl={"xs"}>
 							{prescriptionData?.data?.sat_with_O2} %
 						</Text>
 					</Grid.Col>
 					<Grid.Col span={7} fz="xs" align={"right"}>
-						<Text fz="xs">
-							{t("SatWithoutO2")}
-						</Text>
+						<Text fz="xs">{t("SatWithoutO2")}</Text>
 					</Grid.Col>
-					<Grid.Col span={7} fz="xs" pl={'xs'}>
+					<Grid.Col span={7} fz="xs" pl={"xs"}>
 						{prescriptionData?.data?.sat_without_O2} %
 					</Grid.Col>
 					<Grid.Col span={4}>
-						<Text fz="xs">
-							{t("Temperature")}
-						</Text>
+						<Text fz="xs">{t("Temperature")}</Text>
 					</Grid.Col>
 					<Grid.Col span={6}>
-						<Text fz="xs" pl={'xs'}>
+						<Text fz="xs" pl={"xs"}>
 							{prescriptionData?.data?.temperature} °F
 						</Text>
 					</Grid.Col>
 					<Grid.Col span={7} fz="xs" align={"right"}>
-						<Text fz="xs">
-							{t("Respiration")}
-						</Text>
+						<Text fz="xs">{t("Respiration")}</Text>
 					</Grid.Col>
-					<Grid.Col span={7} fz="xs" pl={'xs'}>
-						{prescriptionData?.data?.respiration}{/* Breath/Minute*/}
+					<Grid.Col span={7} fz="xs" pl={"xs"}>
+						{prescriptionData?.data?.respiration}
+						{/* Breath/Minute*/}
 					</Grid.Col>
 				</Grid>
 				{/*<Vitals form={form} onBlur={onBlur} />*/}

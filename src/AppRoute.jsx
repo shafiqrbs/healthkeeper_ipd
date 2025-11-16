@@ -10,7 +10,6 @@ import DomainUserIndex from "@modules/domain/master-user/DomainUserIndex";
 import HospitalConfigIndex from "@modules/settings/HospitalConfigIndex";
 import PrescriptionIndex from "@modules/hospital/prescription";
 import PrescriptionOpd from "@modules/hospital/prescription/opd";
-import PrescriptionIpd from "@modules/hospital/prescription/ipd";
 import VisitIndex from "@modules/hospital/visit";
 import ParticularIndex from "@modules/hospital/core/particular";
 import BedIndex from "@modules/hospital/core/bed";
@@ -37,10 +36,8 @@ import ParticularMatrixIndex from "@modules/hospital/core/particular-matrix";
 import OpdRoomIndex from "@modules/hospital/core/opd-room";
 import DoctorDashboard from "@modules/hospital/doctor/dashboard";
 import DoctorOpdIndex from "@modules/hospital/doctor/opd";
-import PharmacyIndex from "@modules/pharmacy/dashboard";
 import PharmacyStockIndex from "@modules/pharmacy/stock";
 import MedicineIndex from "@modules/pharmacy/medicine";
-import PharmacyRequisitionIndex from "@modules/pharmacy/requisition";
 import BillingIndex from "@modules/hospital/billing";
 import DoctorIndex from "@modules/hospital/core/doctor";
 import NurseIndex from "@modules/hospital/core/nurse";
@@ -48,7 +45,6 @@ import LabUserIndex from "@modules/hospital/core/lab-user";
 import DosageIndex from "@modules/hospital/core/medicine-dosage";
 import ListIndex from "@modules/hospital/visit/list";
 import ConfigurationIndex from "@modules/configuration";
-import IpdIndex from "@modules/hospital/admission/ipd";
 import IpdAdmissionIndex from "@modules/hospital/admission/ipdAdmission";
 import IpdAdmittedIndex from "@modules/hospital/ipdAdmitted";
 import UserIndex from "@modules/core/user";
@@ -61,9 +57,10 @@ import DoctorLayout from "@components/layout/DoctorLayout";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import DischargeIndex from "@modules/hospital/discharge";
 import FinalBillingIndex from "@modules/hospital/final-billing";
-import PharmacyRequisitionManage from "@modules/pharmacy/requisition/manage";
 import PharmacyWorkorderIndex from "@modules/pharmacy/workorder";
 import PharmacyWorkorderManage from "@modules/pharmacy/workorder/manage";
+import IpdManageIndex from "@modules/hospital/ipdAdmitted/manage";
+import IpdIndex from "@modules/hospital/admission/ipdConfirm";
 
 function AppRoute() {
 	return (
@@ -86,16 +83,19 @@ function AppRoute() {
 					<Route path="config/:id" element={<DomainConfigurationIndex />} />
 					<Route path="user" element={<DomainUserIndex />} />
 				</Route>
-				<Route path="/pharmacy">
-					<Route index element={<PharmacyIndex />} />
-					<Route path="requisition" element={<PharmacyRequisitionIndex />} />
-					<Route path="requisition/manage" element={<PharmacyRequisitionManage />} />
-					<Route path="requisition/manage/:id" element={<PharmacyRequisitionManage mode="edit" />} />
-				</Route>
-				<Route path="/pharmacy/core/">
-					<Route path="medicine" element={<MedicineIndex />} />
-					<Route path="stock" element={<PharmacyStockIndex />} />
 
+				<Route path="/pharmacy/core/">
+					<Route
+						path="medicine"
+						element={
+							<ProtectedRoute
+								roles={["role_domain", "admin_administrator", "operator_opd", "operator_manager"]}
+							>
+								<MedicineIndex />
+							</ProtectedRoute>
+						}
+					/>
+					<Route path="stock" element={<PharmacyStockIndex />} />
 					<Route path="workorder" element={<PharmacyWorkorderIndex />} />
 					<Route path="workorder/manage" element={<PharmacyWorkorderManage />} />
 					<Route path="workorder/manage/:id" element={<PharmacyWorkorderManage mode="edit" />} />
@@ -158,13 +158,22 @@ function AppRoute() {
 						<Route
 							index
 							element={
-								<ProtectedRoute roles={["role_domain", "admin_administrator", "doctor_ipd_admitted"]}>
+								<ProtectedRoute
+									roles={[
+										"role_domain",
+										"admin_administrator",
+										"doctor_ipd_admitted",
+										"nurse_basic",
+										"nurse_incharge",
+									]}
+								>
 									<IpdAdmittedIndex />
 								</ProtectedRoute>
 							}
 						/>
 						<Route path=":id" element={<IpdAdmittedIndex />} />
 						<Route path="prescription/:id" element={<IpdAdmittedIndex />} />
+						<Route path="manage/:id" element={<IpdManageIndex />} />
 					</Route>
 					<Route
 						path="emergency"
@@ -214,25 +223,6 @@ function AppRoute() {
 								</ProtectedRoute>
 							}
 						/>
-
-						{/* <Route
-							path=":prescriptionId"
-							element={
-								<ProtectedRoute
-									roles={["doctor_opd", "admin_administrator", "doctor_ipd", "admin_doctor"]}
-								>
-									<PrescriptionOpd />
-								</ProtectedRoute>
-							}
-						/> */}
-						<Route
-							path="edit/:id"
-							element={
-								<ProtectedRoute roles={["role_domain", "admin_administrator", "doctor_prescription"]}>
-									<PrescriptionIpd />
-								</ProtectedRoute>
-							}
-						/>
 					</Route>
 
 					<Route path="customer">
@@ -256,7 +246,15 @@ function AppRoute() {
 					<Route
 						path="police-case"
 						element={
-							<ProtectedRoute roles={["role_domain", "admin_administrator","doctor_ipd","doctor_emergency","doctor_opd"]}>
+							<ProtectedRoute
+								roles={[
+									"role_domain",
+									"admin_administrator",
+									"doctor_ipd",
+									"doctor_emergency",
+									"doctor_opd",
+								]}
+							>
 								<PoliceCaseIndex />
 							</ProtectedRoute>
 						}
@@ -264,23 +262,31 @@ function AppRoute() {
 					<Route
 						path="police-case/:id"
 						element={
-							<ProtectedRoute roles={["role_domain", "admin_administrator","doctor_ipd","doctor_emergency","doctor_opd"]}>
+							<ProtectedRoute
+								roles={[
+									"role_domain",
+									"admin_administrator",
+									"doctor_ipd",
+									"doctor_emergency",
+									"doctor_opd",
+								]}
+							>
 								<PoliceCaseIndex />
-							</ProtectedRoute>
-						}
-					/>
-					<Route
-						path="free-patient"
-						element={
-							<ProtectedRoute roles={["role_domain", "admin_administrator","doctor_ipd","doctor_emergency","doctor_opd"]}>
-								<FreePatientIndex />
 							</ProtectedRoute>
 						}
 					/>
 					<Route
 						path="free-patient/:id"
 						element={
-							<ProtectedRoute roles={["role_domain", "admin_administrator","doctor_ipd","doctor_emergency","doctor_opd"]}>
+							<ProtectedRoute
+								roles={[
+									"role_domain",
+									"admin_administrator",
+									"doctor_ipd",
+									"doctor_emergency",
+									"doctor_opd",
+								]}
+							>
 								<FreePatientIndex />
 							</ProtectedRoute>
 						}
@@ -433,7 +439,6 @@ function AppRoute() {
 						<Route path="emergency" element={<DoctorDashboard />} />
 						<Route path="emergency/:prescriptionId" element={<DoctorDashboard />} />
 						<Route path="ipd" element={<DoctorDashboard />} />
-						<Route path="requisition" element={<PharmacyRequisitionIndex />} />
 					</Route>
 				</Route>
 

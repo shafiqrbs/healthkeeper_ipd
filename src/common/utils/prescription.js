@@ -59,3 +59,13 @@ export const appendGeneralValuesToForm = (form, selectedMedicine) => {
 	form.setFieldValue("opd_quantity", selectedMedicine?.opd_quantity || 0);
 	form.setFieldValue("opd_limit", selectedMedicine?.opd_quantity || 0);
 };
+
+export const medicineOptionsFilter = ({ options, search }) => {
+	const splittedSearch = search.toLowerCase().trim().split(" ");
+	return options.filter((option) => {
+		const labelWords = option.label.toLowerCase().trim().split(" ");
+		const genericWords = (option.generic || "").toLowerCase().trim().split(" ");
+		const allWords = [...labelWords, ...genericWords];
+		return splittedSearch.every((searchWord) => allWords.some((word) => word.includes(searchWord)));
+	});
+};

@@ -103,7 +103,7 @@ body {
 }
 
 .form-grid {
-    background-color: white;
+    background-color: var(--mantine-color-white);
     border-radius: 8px;
 }
 
@@ -270,7 +270,7 @@ textarea:focus {
 .mantine-AppShell-main {
     padding-top: 42px !important;
     padding-bottom: 0 !important;
-    background: #f0f1f9;
+    background: var(--mantine-color-gray-1);
 }
 
 .grid-radius {
@@ -295,7 +295,7 @@ input[type=radio]+label>img {
     width: 100%;
     height: 52px;
     padding: 4px;
-    background: #ffffff;
+    background: var(--mantine-color-white);
     transition: 500ms all;
     border-radius: 4px;
 }
@@ -303,6 +303,18 @@ input[type=radio]+label>img {
 input[type=radio]:checked+label>img {
     transform:
         rotateZ(-1deg) rotateX(1deg);
+}
+
+.shadow-1 {
+    box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.02), 0px 0px 2px rgba(0, 0, 0, 0.05), 0px 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-2 {
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.03), 0px 0px 2px rgba(0, 0, 0, 0.06), 0px 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.shadow-none {
+    box-shadow: none;
 }
 
 .no-focus-outline:focus {
@@ -334,7 +346,7 @@ input[type=radio]:checked+label>img {
 }
 
 .hoveredItem {
-    background-color: #f8d4d4 !important;
+    background-color: var(--mantine-color-gray-2) !important;
     border-radius: 4px;
 }
 
@@ -358,7 +370,7 @@ input[type=radio]:checked+label>img {
 }
 
 .btnPrimaryResetBg {
-    background-color: white !important;
+    background-color: var(--mantine-color-white) !important;
     border: 1px solid var(--theme-primary-color-6) !important;
     color: var(--theme-primary-color-6) !important;
 }
@@ -393,7 +405,7 @@ input[type=radio]:checked+label>img {
 
 .drawer-form-stack-vertical {
     padding-top: 14px;
-    border: 4px solid white;
+    border: 4px solid var(--mantine-color-white);
     background-color: var(--mantine-color-gray-0);
     border-radius: 4px;
     padding-inline: 14px;
@@ -448,7 +460,7 @@ input[type=radio]:checked+label>img {
 .header-action-icon {
     color: var(--theme-primary-color-6) !important;
     border-radius: 100% !important;
-    background-color: white !important;
+    background-color: var(--mantine-color-white) !important;
 }
 
 .header-carousel {
@@ -475,7 +487,7 @@ input[type=radio]:checked+label>img {
 
 #overview-tabs .mantine-Tabs-tab[data-active] {
     z-index: 1;
-    background-color: white;
+    background-color: var(--mantine-color-white);
     border: none;
     border-radius: 4px;
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
@@ -506,7 +518,7 @@ input[type=radio]:checked+label>img {
 /* // patent form */
 
 .form-stack-box {
-    border: 4px solid white;
+    border: 4px solid var(--mantine-color-white);
     background-color: var(--theme-tertiary-color-0);
     border-radius: 4px;
     padding: 14px;
@@ -514,7 +526,7 @@ input[type=radio]:checked+label>img {
 }
 
 .form-stack-vertical {
-    border: 4px solid white;
+    border: 4px solid var(--mantine-color-white);
     background-color: var(--theme-tertiary-color-0);
     border-radius: 4px;
     padding: 14px;
@@ -540,7 +552,7 @@ input[type=radio]:checked+label>img {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    background-color: white;
+    background-color: var(--mantine-color-white);
     padding-block: 6px;
 }
 
@@ -559,7 +571,7 @@ input[type=radio]:checked+label>img {
 }
 
 .full-bleed {
-    box-shadow: 0 0 0 100vmax white !important;
+    box-shadow: 0 0 0 100vmax var(--mantine-color-white) !important;
     clip-path: inset(0 -100vmax) !important;
 }
 
@@ -610,7 +622,7 @@ input[type=radio]:checked+label>img {
     background-color: var(--theme-primary-color-6);
     border-radius: 100%;
     padding: 8px;
-    color: white;
+    color: var(--mantine-color-white);
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
@@ -667,7 +679,12 @@ input[type=radio]:checked+label>img {
     height: 38px !important;
     border-radius: 4px;
     padding-inline: 8px;
-    border-color: #ced4da;
+    border-color: var(--mantine-color-gray-3);
+}
+
+.react-datepicker__input-container :is(#vital-date, #insulin-date) {
+    height: 30px !important;
+    font-size: 12px;
 }
 
 .inner-title-box {
@@ -696,4 +713,51 @@ input[type=radio]:checked+label>img {
     height: 160px !important;
     resize: none;
     /* prevent manual resize */
+}
+
+input.date-selector-input {
+    height: 30px !important;
+    font-size: 13px !important;
+}
+
+.date-selector-input {
+    font-size: 12px;
+    border: 1px solid var(--theme-tertiary-color-6);
+    border-radius: 6px;
+    padding: 4px 8px;
+    width: 100%;
+}
+
+.date-selector-input:focus {
+    border: 1px solid var(--theme-tertiary-color-6);
+    outline: none;
+}
+
+#invoice-details-tabs {
+    .mantine-Tabs-list {
+        position: absolute;
+        top: 13px;
+        right: 10px;
+    }
+}
+
+:root[data-mantine-color-scheme='dark'] {
+    --mantine-color-white: #242424;
+    --mantine-color-gray-0: #1a1a1a;
+    --mantine-color-gray-1: #333333;
+    --mantine-color-gray-2: #242424;
+    --mantine-color-gray-3: #181818;
+    --mantine-color-gray-8: #bfc2c4;
+    --theme-tertiary-color-0: var(--mantine-color-gray-0);
+    --theme-primary-color-0: #1B262D;
+    --theme-primary-color-1: #16303F;
+
+    --mantine-color-dark-5: #c9c9c9;
+    --mantine-color-dark-7: #2e2e2e;
+
+    --theme-secondary-color-0: #18241B;
+    --mantine-color-cyan-0: #132527;
+
+    --mantine-color-black: white;
+    --theme-tertiary-color-4: #4a4a4a;
 }

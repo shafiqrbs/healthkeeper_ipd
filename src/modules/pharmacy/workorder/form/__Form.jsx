@@ -1,20 +1,22 @@
-import {Group, Box, ActionIcon, Text, Flex, Button, Grid, Select, Stack, rem} from "@mantine/core";
+import { Group, Box, ActionIcon, Text, Flex, Button, Grid, Select, Stack, rem } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import inputCss from "@assets/css/TextAreaInputField.module.css";
 import {
-    IconChevronUp,
-    IconX,
-    IconSelector,
-    IconEye,
-    IconPlus,
-    IconDeviceFloppy,
-    IconHistory, IconCheck, IconAlertCircle,
+	IconChevronUp,
+	IconX,
+	IconSelector,
+	IconEye,
+	IconPlus,
+	IconDeviceFloppy,
+	IconHistory,
+	IconCheck,
+	IconAlertCircle,
 } from "@tabler/icons-react";
 import { DataTable } from "mantine-datatable";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { modals } from "@mantine/modals";
 import { useDebouncedState, useDisclosure } from "@mantine/hooks";
-import {CORE_DATA_ROUTES, PHARMACY_DATA_ROUTES} from "@/constants/routes";
+import { CORE_DATA_ROUTES, PHARMACY_DATA_ROUTES } from "@/constants/routes";
 import tableCss from "@assets/css/Table.module.css";
 import React, { useEffect, useState } from "react";
 import { useForm } from "@mantine/form";
@@ -22,20 +24,20 @@ import { getInitialValues, getWorkorderFormInitialValues } from "../helpers/requ
 import InputNumberForm from "@components/form-builders/InputNumberForm";
 import DatePickerForm from "@components/form-builders/DatePicker";
 import useMedicineData from "@hooks/useMedicineData";
-import {formatDate, formatDateForMySQL, getLoggedInUser} from "@utils/index";
+import { formatDate, formatDateForMySQL, getLoggedInUser } from "@utils/index";
 import TextAreaForm from "@components/form-builders/TextAreaForm";
 import GlobalDrawer from "@components/drawers/GlobalDrawer";
 import { getDataWithoutStore } from "@/services/apiService";
 import useGlobalDropdownData from "@hooks/dropdown/useGlobalDropdownData";
-import {CORE_DROPDOWNS} from "@/app/store/core/utilitySlice";
+import { CORE_DROPDOWNS } from "@/app/store/core/utilitySlice";
 import RequiredAsterisk from "@components/form-builders/RequiredAsterisk";
 import SelectForm from "@components/form-builders/SelectForm";
-import {storeEntityData} from "@/app/store/core/crudThunk.js";
+import { storeEntityData } from "@/app/store/core/crudThunk.js";
 import useVendorDataStoreIntoLocalStorage from "@hooks/local-storage/useVendorDataStoreIntoLocalStorage.js";
-import {setRefetchData} from "@/app/store/core/crudSlice.js";
-import {notifications} from "@mantine/notifications";
-import {ERROR_NOTIFICATION_COLOR, SUCCESS_NOTIFICATION_COLOR} from "@/constants/index.js";
-import {useDispatch} from "react-redux";
+import { setRefetchData } from "@/app/store/core/crudSlice.js";
+import { notifications } from "@mantine/notifications";
+import { ERROR_NOTIFICATION_COLOR, SUCCESS_NOTIFICATION_COLOR } from "@/constants/index.js";
+import { useDispatch } from "react-redux";
 
 export default function __Form() {
 	const { id } = useParams();
@@ -44,8 +46,8 @@ export default function __Form() {
 	const [medicineTerm, setMedicineTerm] = useDebouncedState("", 300);
 	const { medicineData } = useMedicineData({ term: medicineTerm });
 	const { mainAreaHeight } = useOutletContext();
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
 	const height = mainAreaHeight - 78;
 	const [resetKey, setResetKey] = useState(0);
 
@@ -72,7 +74,6 @@ export default function __Form() {
 		path: CORE_DROPDOWNS.VENDOR.PATH,
 		utility: CORE_DROPDOWNS.VENDOR.UTILITY,
 	});
-
 
 	async function handleWorkorderAdd(values) {
 		setRecords([...records, values]);
@@ -104,86 +105,81 @@ export default function __Form() {
 		form.setFieldValue("generic", selectedMedicine.generic);
 	};
 
-    const [isSaving, setIsSaving] = useState(false);
+	const [isSaving, setIsSaving] = useState(false);
 
-    const handleWorkOrderSave = (values) => {
-        const validation = workOrderForm.validate();
-        if (validation.hasErrors) return;
+	const handleWorkOrderSave = (values) => {
+		const validation = workOrderForm.validate();
+		if (validation.hasErrors) return;
 
-        modals.openConfirmModal({
-            title: <Text size="md">{t("FormConfirmationTitle")}</Text>,
-            children: <Text size="sm">{t("FormConfirmationMessage")}</Text>,
-            labels: { confirm: t("Submit"), cancel: t("Cancel") },
-            confirmProps: { color: "red", loading: isSaving },
-            onCancel: () => console.info("Cancelled"),
-            onConfirm: () => saveWorkOrderToDB(values),
-        });
-    };
+		modals.openConfirmModal({
+			title: <Text size="md">{t("FormConfirmationTitle")}</Text>,
+			children: <Text size="sm">{t("FormConfirmationMessage")}</Text>,
+			labels: { confirm: t("Submit"), cancel: t("Cancel") },
+			confirmProps: { color: "red", loading: isSaving },
+			onCancel: () => console.info("Cancelled"),
+			onConfirm: () => saveWorkOrderToDB(values),
+		});
+	};
 
-    async function saveWorkOrderToDB(values) {
-        modals.closeAll();
-        setIsSaving(true);
-        try {
-            const payload = {
-                ...values,
-                items: records.map((r) => ({
-                    ...r,
-                    production_date: formatDateForMySQL(r.production_date),
-                    expired_date: formatDateForMySQL(r.expired_date),
-                })),
-                created_by_id: getLoggedInUser()?.id,
-            };
+	async function saveWorkOrderToDB(values) {
+		modals.closeAll();
+		setIsSaving(true);
+		try {
+			const payload = {
+				...values,
+				items: records.map((r) => ({
+					...r,
+					production_date: formatDateForMySQL(r.production_date),
+					expired_date: formatDateForMySQL(r.expired_date),
+				})),
+				created_by_id: getLoggedInUser()?.id,
+			};
 
-            const requestData = {
-                url: PHARMACY_DATA_ROUTES.API_ROUTES.PURCHASE.CREATE,
-                data: payload,
-                module: "vendor",
-            };
+			const requestData = {
+				url: PHARMACY_DATA_ROUTES.API_ROUTES.PURCHASE.CREATE,
+				data: payload,
+				module: "vendor",
+			};
 
-            const result = await dispatch(storeEntityData(requestData));
+			const result = await dispatch(storeEntityData(requestData));
 
-            if (storeEntityData.rejected.match(result)) {
-                const fieldErrors = result.payload?.errors;
-                if (fieldErrors) {
-                    form.setErrors(
-                        Object.fromEntries(
-                            Object.entries(fieldErrors).map(([k, v]) => [k, v[0]])
-                        )
-                    );
-                } else {
-                    notifications.show({
-                        color: ERROR_NOTIFICATION_COLOR,
-                        title: t("ServerError"),
-                        message: result.error?.message || t("UnexpectedError"),
-                    });
-                }
-            } else if (storeEntityData.fulfilled.match(result)) {
-                form.reset();
-                workOrderForm.reset();
-                notifications.show({
-                    color: SUCCESS_NOTIFICATION_COLOR,
-                    title: t("CreateSuccessfully"),
-                    icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
-                    autoClose: 800,
-                    onClose: () => navigate("/pharmacy/core/workorder"),
-                });
-            }
-        } catch (error) {
-            console.error(error);
-            notifications.show({
-                color: ERROR_NOTIFICATION_COLOR,
-                title: t("ErrorOccurred"),
-                message: error.message,
-                icon: <IconAlertCircle style={{ width: rem(18), height: rem(18) }} />,
-                autoClose: 800,
-            });
-        } finally {
-            setIsSaving(false);
-        }
-    }
+			if (storeEntityData.rejected.match(result)) {
+				const fieldErrors = result.payload?.errors;
+				if (fieldErrors) {
+					form.setErrors(Object.fromEntries(Object.entries(fieldErrors).map(([k, v]) => [k, v[0]])));
+				} else {
+					notifications.show({
+						color: ERROR_NOTIFICATION_COLOR,
+						title: t("ServerError"),
+						message: result.error?.message || t("UnexpectedError"),
+					});
+				}
+			} else if (storeEntityData.fulfilled.match(result)) {
+				form.reset();
+				workOrderForm.reset();
+				notifications.show({
+					color: SUCCESS_NOTIFICATION_COLOR,
+					title: t("CreateSuccessfully"),
+					icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+					autoClose: 800,
+					onClose: () => navigate("/pharmacy/core/workorder"),
+				});
+			}
+		} catch (error) {
+			console.error(error);
+			notifications.show({
+				color: ERROR_NOTIFICATION_COLOR,
+				title: t("ErrorOccurred"),
+				message: error.message,
+				icon: <IconAlertCircle style={{ width: rem(18), height: rem(18) }} />,
+				autoClose: 800,
+			});
+		} finally {
+			setIsSaving(false);
+		}
+	}
 
-
-    /*const handleWorkOrderSave = (values) => {
+	/*const handleWorkOrderSave = (values) => {
         modals.openConfirmModal({
             title: <Text size="md"> {t("FormConfirmationTitle")}</Text>,
             children: <Text size="sm"> {t("FormConfirmationMessage")}</Text>,
@@ -452,9 +448,11 @@ export default function __Form() {
 					className="borderRadiusAll"
 				>
 					<Box w="50%" bg="var(--theme-primary-color-0)" fz="sm" c="white">
-						<Grid align="center" columns={20} mt="xxxs">
+						<Grid align="center" columns={20} mt="3xs">
 							<Grid.Col span={6}>
-								<Text fz="sm">{t("ParticularType")} <RequiredAsterisk /></Text>
+								<Text fz="sm">
+									{t("ParticularType")} <RequiredAsterisk />
+								</Text>
 							</Grid.Col>
 						</Grid>
 						<Text bg="var(--theme-secondary-color-6)" fz="sm" c="white" px="sm" py="les">
@@ -473,17 +471,17 @@ export default function __Form() {
 						</Box>
 					</Box>
 					<Stack gap="xs" px="sm">
-                            <SelectForm
-                                form={workOrderForm}
-                                tooltip={t("ChooseVendor")}
-                                placeholder={t("ChooseVendor")}
-                                name="vendor_id"
-                                id="vendor_id"
-                                nextField="EntityFormSubmit"
-                                required={true}
-                                value={workOrderForm.values.vendor_id}
-                                dropdownValue={vendorDropdown}
-                            />
+						<SelectForm
+							form={workOrderForm}
+							tooltip={t("ChooseVendor")}
+							placeholder={t("ChooseVendor")}
+							name="vendor_id"
+							id="vendor_id"
+							nextField="EntityFormSubmit"
+							required={true}
+							value={workOrderForm.values.vendor_id}
+							dropdownValue={vendorDropdown}
+						/>
 						{/*<DatePickerForm
 							form={workOrderForm}
 							tooltip={t("NameValidationMessage")}
