@@ -488,9 +488,9 @@ export default function Header({ isOnline, configData, mainAreaHeight }) {
 						<Logo configData={configData} navigate={navigate} />
 					</Grid.Col>
 					<Grid.Col span={matches2 ? 6 : matches ? 10 : 12}>
-						<Group align="center" gap={"md"} wrap="nowrap" mih={42}>
+						{/* <Group align="center" gap={"md"} wrap="nowrap" mih={42}>
 							<SearchButton matches2={matches2} t={t} onClick={() => setShortcutModalOpen(true)} />
-						</Group>
+						</Group> */}
 					</Grid.Col>
 					<Grid.Col span={matches2 ? 12 : matches ? 8 : 6}>
 						<HeaderActions

@@ -5,13 +5,21 @@ import HomeSkeleton from "@components/skeletons/HomeSkeleton";
 import { getUserRole } from "@utils/index";
 import OperatorBoard from "@/modules/home/operator/OperatorBoard";
 import AdminBoard from "./operator/AdminBoard";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { HOSPITAL_DATA_ROUTES } from "@/constants/routes";
 
 const ALLOWED_ADMIN_ROLES = ["admin_hospital", "admin_administrator"];
 const ALLOWED_OPERATOR_ROLES = ["operator_opd", "operator_manager", "operator_emergency"];
 
 export default function Index({ height }) {
+	const navigate = useNavigate();
 	const progress = useGetLoadingProgress();
 	const userRoles = getUserRole();
+
+	useEffect(() => {
+		navigate(HOSPITAL_DATA_ROUTES.NAVIGATION_LINKS.IPD_ADMITTED.INDEX);
+	}, []);
 
 	return (
 		<>
@@ -23,8 +31,12 @@ export default function Index({ height }) {
 						<Navigation module="home" mainAreaHeight={height} />
 						{/* ================= carousel part ================== */}
 						<Box w="100%" mainAreaHeight={height}>
-							{userRoles.some((role) => ALLOWED_OPERATOR_ROLES.includes(role)) && <OperatorBoard height={height} />}
-							{userRoles.some((role) => ALLOWED_ADMIN_ROLES.includes(role)) && <AdminBoard height={height} />}
+							{userRoles.some((role) => ALLOWED_OPERATOR_ROLES.includes(role)) && (
+								<OperatorBoard height={height} />
+							)}
+							{userRoles.some((role) => ALLOWED_ADMIN_ROLES.includes(role)) && (
+								<AdminBoard height={height} />
+							)}
 						</Box>
 					</Flex>
 				</Box>

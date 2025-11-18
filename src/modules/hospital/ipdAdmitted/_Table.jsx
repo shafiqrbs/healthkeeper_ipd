@@ -6,8 +6,23 @@ import {
 	IconDotsVertical,
 	IconPrinter,
 	IconFileText,
+	IconCalendarWeek,
+	IconUser,
 } from "@tabler/icons-react";
-import { Box, Flex, Text, ActionIcon, Group, Button, SegmentedControl, Menu, rem } from "@mantine/core";
+import {
+	Box,
+	Flex,
+	Text,
+	ActionIcon,
+	Group,
+	Button,
+	SegmentedControl,
+	Menu,
+	rem,
+	ScrollArea,
+	Grid,
+	LoadingOverlay,
+} from "@mantine/core";
 import { HOSPITAL_DATA_ROUTES } from "@/constants/routes";
 import { MODULES } from "@/constants";
 import { useDispatch, useSelector } from "react-redux";
@@ -64,9 +79,9 @@ export default function _Table({ setSelectedPrescriptionId, ipdMode, setIpdMode 
 		filterParams: {
 			name: filterData?.name,
 			patient_mode: "ipd",
-			term: filterData.keywordSearch,
+			term: form.values.keywordSearch,
 			prescription_mode: ipdMode,
-			created: filterData.created,
+			created: form.values.created,
 		},
 		perPage: PER_PAGE,
 		sortByKey: "created_at",
@@ -115,14 +130,7 @@ export default function _Table({ setSelectedPrescriptionId, ipdMode, setIpdMode 
 
 	const handleManageOverview = (prescriptionId, id) => {
 		setSelectedPrescriptionId(prescriptionId);
-		modals.openConfirmModal({
-			title: <Text size="md"> {t("FormConfirmationTitle")}</Text>,
-			children: <Text size="sm"> {t("AreYouSureYouWantCreateAE-FreshPrescription")}</Text>,
-			labels: { confirm: t("Confirm"), cancel: t("Cancel") },
-			confirmProps: { color: "red" },
-			onCancel: () => console.info("Cancel"),
-			onConfirm: () => navigate(`${HOSPITAL_DATA_ROUTES.NAVIGATION_LINKS.IPD_ADMITTED.MANAGE}/${prescriptionId}`),
-		});
+		navigate(`${HOSPITAL_DATA_ROUTES.NAVIGATION_LINKS.IPD_ADMITTED.MANAGE}/${prescriptionId}`);
 	};
 
 	const handleChangeIpdMode = () => {
@@ -159,234 +167,76 @@ export default function _Table({ setSelectedPrescriptionId, ipdMode, setIpdMode 
 	return (
 		<Box pos="relative">
 			<Flex align="center" justify="space-between">
-				<KeywordSearch showOpdRoom showUnits form={form} module={module} />
-
-				<SegmentedControl
-					w={220}
-					size="sm"
-					color="var(--theme-primary-color-6)"
-					value={ipdMode}
-					onChange={(value) => {
-						setIpdMode(value);
-						if (value === "non-prescription") {
-							handleChangeIpdMode();
-						}
-					}}
-					data={[
-						{ label: t("Prescription"), value: "non-prescription" },
-						{ label: t("Manage"), value: "prescription" },
-					]}
-				/>
+				<KeywordSearch form={form} module={module} />
 			</Flex>
-			<Box className="borderRadiusAll border-top-none">
-				<DataTable
-					striped
-					highlightOnHover
-					pinFirstColumn
-					pinLastColumn
-					stripedColor="var(--theme-tertiary-color-1)"
-					classNames={{
-						root: tableCss.root,
-						table: tableCss.table,
-						header: tableCss.header,
-						footer: tableCss.footer,
-						pagination: tableCss.pagination,
-					}}
-					records={records}
-					columns={[
-						{
-							accessor: "index",
-							title: t("S/N"),
-							textAlignment: "right",
-							render: (_, index) => index + 1,
-						},
-						{
-							accessor: "created_at",
-							title: t("Created"),
-							textAlignment: "right",
-							render: (item) => (
-								<Text fz="xs" className="activate-link">
-									{formatDate(item.created_at)}
-								</Text>
-							),
-						},
-						{
-							accessor: "admission_date",
-							title: t("AdmissionDate"),
-							textAlignment: "right",
-							render: (item) => formatDate(item.admission_date),
-						},
-						{ accessor: "patient_id", title: t("patientId") },
-						{ accessor: "name", title: t("Name") },
-						{ accessor: "mobile", title: t("Mobile") },
-						{ accessor: "room_name", title: t("Bed/Cabin") },
-						{ accessor: "admission_day", title: t("AdmissionDay") },
-						{ accessor: "consume_day", title: t("ConsumeDay") },
-						{ accessor: "remaining_day", title: t("RemainingDay") },
-						{
-							accessor: "total",
-							title: t("Total"),
-							render: (item) => t(item.total),
-						},
-						{
-							accessor: "amount",
-							title: t("Amount"),
-							render: (item) => t(item.amount),
-						},
-						{
-							accessor: "due",
-							title: t("Due"),
-							render: (item) => t(item.total - item.amount),
-						},
-						{
-							accessor: "action",
-							title: t("Action"),
-							textAlign: "right",
-							titleClassName: "title-right",
-							render: (values) => (
-								<Group onClick={(e) => e.stopPropagation()} gap={4} justify="right" wrap="nowrap">
-									{ipdMode === "non-prescription" && (
-										<Button
-											rightSection={<IconArrowNarrowRight size={18} />}
-											onClick={() => handleProcessConfirmation(values.id, values.uid)}
-											variant="filled"
-											color="var(--theme-primary-color-6)"
-											radius="xs"
-											aria-label="Settings"
-											size="compact-xs"
-											fw={400}
-										>
-											{t("Prescription")}
-										</Button>
-									)}
-									{ipdMode === "prescription" && values.prescription_id && (
-										<>
-											<Button
-												rightSection={<IconArrowNarrowRight size={18} />}
-												onClick={() => handleManageOverview(values.uid, values.id)}
-												variant="filled"
-												color="var(--theme-primary-color-6)"
-												radius="xs"
-												aria-label="Settings"
-												size="compact-xs"
-												fw={400}
-											>
-												{t("Manage")}
-											</Button>
-											{/* <Button
-												rightSection={<IconArrowNarrowRight size={18} />}
-												onClick={() => openManageIpd()}
-												variant="filled"
-												color="var(--theme-primary-color-6)"
-												radius="xs"
-												aria-label="Settings"
-												size="compact-xs"
-												fw={400}
-											>
-												{t("Instant")}
-											</Button> */}
-										</>
-									)}
+			<Box className="borderRadiusAll border-top-none" pos="relative">
+				<LoadingOverlay visible={fetching} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
+				<Box>
+					<Flex gap="sm" p="les" c="white" bg="var(--theme-primary-color-6)" mt="3xs">
+						<Text ta="center" fz="sm" fw={500}>
+							S/N
+						</Text>
+						<Text ta="center" fz="sm" fw={500}>
+							Patient Name
+						</Text>
+					</Flex>
+					<ScrollArea bg="white" h={mainAreaHeight - 150} scrollbars="y" px="3xs">
+						{records?.map((item, index) => (
+							<Grid
+								columns={12}
+								key={item.id}
+								my="xs"
+								bg={index % 2 === 0 ? "var(--theme-primary-color-0)" : "var(--theme-tertiary-color-0)"}
+								px="xs"
+								gutter="xs"
+							>
+								<Grid.Col span={3}>
+									<Flex align="center" gap="3xs">
+										<IconCalendarWeek size={16} stroke={1.5} />
 
-									<Menu
-										position="bottom-end"
-										offset={3}
-										withArrow
-										trigger="hover"
-										openDelay={100}
-										closeDelay={400}
+										<Text fz="sm" className="activate-link text-nowrap">
+											{formatDate(item?.created_at)}
+										</Text>
+									</Flex>
+									<Flex align="center" gap="3xs">
+										<IconUser size={16} stroke={1.5} />
+										<Text fz="sm">{item.patient_id}</Text>
+									</Flex>
+								</Grid.Col>
+								<Grid.Col span={3}>
+									<Box>
+										<Text fz="sm">{item.name}</Text>
+										<Text fz="sm">{item.room_name || "N/A"}</Text>
+									</Box>
+								</Grid.Col>
+								<Grid.Col span={5}>
+									<Box>
+										<Text fz="sm">
+											Days: {item.admission_day ?? 0}, Consumed: {item.consume_day ?? 0}, Remains:{" "}
+											{item.remaining_day ?? 0}
+										</Text>
+										<Text fz="sm">
+											Total: {item.total ?? 0}, Amount: {item.amount ?? 0}, Due:{" "}
+											{item.total ?? 0 - item.amount ?? 0}
+										</Text>
+									</Box>
+								</Grid.Col>
+								<Grid.Col span={1} ta="right">
+									<ActionIcon
+										variant="filled"
+										onClick={() => handleManageOverview(item.uid, item.id)}
+										color="var(--theme-primary-color-6)"
+										radius="xs"
+										aria-label="Settings"
+										mt="les"
 									>
-										<Menu.Target>
-											<ActionIcon
-												className="border-left-radius-none"
-												variant="transparent"
-												color="var(--theme-menu-three-dot)"
-												radius="es"
-												aria-label="Settings"
-											>
-												<IconDotsVertical height={18} width={18} stroke={1.5} />
-											</ActionIcon>
-										</Menu.Target>
-										<Menu.Dropdown>
-											{values?.prescription_id && (
-												<>
-													<Menu.Item
-														leftSection={
-															<IconPrinter
-																style={{
-																	width: rem(14),
-																	height: rem(14),
-																}}
-															/>
-														}
-														onClick={() => handlePrescriptionPrint(values?.uid)}
-													>
-														{t("Prescription")}
-													</Menu.Item>
-												</>
-											)}
-
-											<Menu.Item
-												leftSection={
-													<IconPrinter
-														style={{
-															width: rem(14),
-															height: rem(14),
-														}}
-													/>
-												}
-												onClick={() => handleAdmissionFormPrint(values?.id)}
-											>
-												{t("AdmissionForm")}
-											</Menu.Item>
-
-											<Menu.Item
-												leftSection={
-													<IconPrinter
-														style={{
-															width: rem(14),
-															height: rem(14),
-														}}
-													/>
-												}
-												onClick={() => handleBillingInvoicePrint(values?.id)}
-											>
-												{t("BillingInvoice")}
-											</Menu.Item>
-
-											<Menu.Item
-												leftSection={
-													<IconFileText
-														style={{
-															width: rem(14),
-															height: rem(14),
-														}}
-													/>
-												}
-												onClick={() => handleDischargePaperPrint(values?.id)}
-											>
-												{t("DischargePaper")}
-											</Menu.Item>
-										</Menu.Dropdown>
-									</Menu>
-								</Group>
-							),
-						},
-					]}
-					textSelectionDisabled
-					fetching={fetching}
-					loaderSize="xs"
-					loaderColor="grape"
-					height={height}
-					onScrollToBottom={handleScrollToBottom}
-					scrollViewportRef={scrollRef}
-					sortStatus={sortStatus}
-					onSortStatusChange={setSortStatus}
-					sortIcons={{
-						sorted: <IconChevronUp color="var(--theme-tertiary-color-7)" size={14} />,
-						unsorted: <IconSelector color="var(--theme-tertiary-color-7)" size={14} />,
-					}}
-				/>
+										<IconArrowNarrowRight style={{ width: "70%", height: "70%" }} stroke={1.5} />
+									</ActionIcon>
+								</Grid.Col>
+							</Grid>
+						))}
+					</ScrollArea>
+				</Box>
 			</Box>
 			<DataTableFooter indexData={records} module="ipd" />
 

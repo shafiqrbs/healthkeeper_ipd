@@ -55,24 +55,22 @@ function FooterNavbar() {
 	));
 
 	return (
-		<>
-			<footer className={classes.footer}>
-				<div className={classes.inner}>
-					<Group gap={5} className={classes.links} visibleFrom="sm">
+		<footer className={classes.footer}>
+			<div className={classes.inner}>
+				<Group gap={5} className={classes.links}>
+					<Flex gap="md" mih={42} justify="flex-start" align="center" direction="row" wrap="wrap">
+						{leftItems}
+					</Flex>
+				</Group>
+				<Group>
+					<Group ml={50} gap={5} className={classes.links}>
 						<Flex gap="md" mih={42} justify="flex-start" align="center" direction="row" wrap="wrap">
-							{leftItems}
+							{items}
 						</Flex>
 					</Group>
-					<Group>
-						<Group ml={50} gap={5} className={classes.links} visibleFrom="sm">
-							<Flex gap="md" mih={42} justify="flex-start" align="center" direction="row" wrap="wrap">
-								{items}
-							</Flex>
-						</Group>
-					</Group>
-				</div>
-			</footer>
-		</>
+				</Group>
+			</div>
+		</footer>
 	);
 }
 export default FooterNavbar;

@@ -39,8 +39,6 @@ export default function Index() {
 			) : (
 				<Box p="md">
 					<Flex w="100%" gap="xs">
-						<Navigation module="home" mainAreaHeight={mainAreaHeight} />
-
 						{id ? (
 							<Box w="100%">
 								{showTabs ? (

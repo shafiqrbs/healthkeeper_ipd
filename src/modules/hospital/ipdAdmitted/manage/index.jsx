@@ -27,17 +27,7 @@ import Discharge from "../common/tabs/Discharge";
 
 const module = MODULES.E_FRESH;
 
-const TAB_ITEMS = [
-	"Dashboard",
-	"E-Fresh",
-	"Investigation",
-	"Medicine",
-	"Vitals Chart",
-	"Insulin Chart",
-	"Final Bill",
-	"Room Transfer",
-	"Discharge",
-];
+const TAB_ITEMS = ["Dashboard", "E-Fresh", "Investigation", "Vitals Chart", "Insulin Chart"];
 
 export default function Index() {
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -118,9 +108,8 @@ export default function Index() {
 		<Box pos="relative">
 			<LoadingOverlay visible={isLoading} overlayProps={{ radius: "sm", blur: 2 }} />
 			<Flex w="100%" gap="xs" p="16px">
-				<Navigation module="home" mainAreaHeight={mainAreaHeight} />
 				<Grid w="100%" columns={24} gutter="xs">
-					<Grid.Col span={3}>
+					<Grid.Col pos="sticky" top={52} span={6} h="fit-content" style={{ alignSelf: "flex-start" }}>
 						<Box style={{ overflow: "hidden" }} h={mainAreaHeight - 14}>
 							<Box mb="xs" bg="var(--theme-primary-color-1)">
 								<Box
@@ -180,7 +169,7 @@ export default function Index() {
 							</ScrollArea>
 						</Box>
 					</Grid.Col>
-					<Grid.Col w="100%" span={showHistory ? 17 : 21}>
+					<Grid.Col w="100%" span={18}>
 						{baseTabValue === "e-fresh" && (
 							<Stack w="100%" gap={0}>
 								<BaseTabs
@@ -212,7 +201,6 @@ export default function Index() {
 							</Stack>
 						)}
 						{baseTabValue === "dashboard" && <Dashboard />}
-						{baseTabValue === "medicine" && <Medicine />}
 						{baseTabValue === "investigation" && <Investigation />}
 						{baseTabValue === "vitals chart" && (
 							<VitalsChart refetch={refetch} data={prescriptionData?.data} />
@@ -220,9 +208,6 @@ export default function Index() {
 						{baseTabValue === "insulin chart" && (
 							<InsulinChart refetch={refetch} data={prescriptionData?.data} />
 						)}
-						{baseTabValue === "discharge" && <Discharge />}
-
-						{/* /here */}
 
 						{!baseTabValue && (
 							<Flex bg="var(--mantine-color-white)" align="center" justify="center" w="100%" h="100%">
