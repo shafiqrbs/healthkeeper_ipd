@@ -2,9 +2,10 @@ import { Box, Divider, Flex, Grid, Stack, Text, ThemeIcon } from "@mantine/core"
 import { useTranslation } from "react-i18next";
 import Vitals from "@hospital-components/tab-items/Vitals";
 import { IconSofa } from "@tabler/icons-react";
+
 export default function BasicInfoCard({ form, prescriptionData, onBlur }) {
 	const { t } = useTranslation();
-	console.log(prescriptionData);
+
 	return (
 		<Stack gap="3xs" bg="var(--theme-primary-color-1)" p="xs" pb={"3xs"} className="borderRadiusAll">
 			<Stack gap={0} ta="left">

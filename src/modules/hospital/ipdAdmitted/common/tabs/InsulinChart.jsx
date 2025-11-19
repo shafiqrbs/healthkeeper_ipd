@@ -200,7 +200,7 @@ export default function InsulinChart({ data, refetch }) {
 				</Text>
 			</Group>
 
-			<Box
+			{/* <Box
 				bg="var(--theme-secondary-color-0)"
 				p="xs"
 				component="form"
@@ -350,7 +350,7 @@ export default function InsulinChart({ data, refetch }) {
 						Add
 					</Button>
 				</Flex>
-			</Box>
+			</Box> */}
 
 			<DataTable
 				striped

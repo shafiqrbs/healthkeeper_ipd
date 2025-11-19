@@ -482,126 +482,122 @@ export default function AddMedicineForm({
 				p="sm"
 			>
 				<Grid w="100%" columns={24} gutter="3xs">
-					<Grid.Col span={18}>
-						<Group align="end" gap="les">
-							<Grid w="100%" columns={12} gutter="3xs">
-								<Grid.Col span={6}>
-									<FormValidatorWrapper opened={medicineForm.errors.medicine_id}>
+					<Grid.Col span={14}>
+						<Grid w="100%" columns={10} gutter="3xs">
+							<Grid.Col span={5}>
+								<FormValidatorWrapper opened={medicineForm.errors.medicine_id}>
+									<Select
+										clearable
+										searchable
+										filter={medicineOptionsFilter}
+										onSearchChange={setMedicineTerm}
+										id="medicine_id"
+										name="medicine_id"
+										data={medicineData?.map((item) => ({
+											label: item.product_name,
+											value: item.product_id?.toString(),
+											generic: item.generic || "",
+										}))}
+										value={medicineForm.values.medicine_id}
+										onChange={(v) => handleChange("medicine_id", v)}
+										placeholder={t("Medicine")}
+										tooltip="Select medicine"
+										nothingFoundMessage="Type to find medicine..."
+										classNames={inputCss}
+										error={!!medicineForm.errors.medicine_id}
+									/>
+								</FormValidatorWrapper>
+							</Grid.Col>
+							<Grid.Col span={5}>
+								<FormValidatorWrapper opened={medicineForm.errors.generic}>
+									<Autocomplete
+										tooltip={t("EnterGenericName")}
+										id="generic"
+										name="generic"
+										clearable
+										data={medicineGenericData?.map((item, index) => ({
+											label: item?.name || item?.product_name,
+											value: `${item.name} ${index}`,
+											generic: item?.generic || "",
+										}))}
+										filter={medicineOptionsFilter}
+										value={medicineForm.values.generic}
+										onChange={(v) => {
+											handleChange("generic", v);
+											setMedicineGenericTerm(v);
+										}}
+										placeholder={t("GenericName")}
+										classNames={inputCss}
+										error={!!medicineForm.errors.generic}
+									/>
+								</FormValidatorWrapper>
+							</Grid.Col>
+						</Grid>
+						<Grid w="100%" columns={8} gutter="3xs">
+							<Grid.Col span={7}>
+								<Group grow gap="les">
+									<FormValidatorWrapper
+										position="bottom-end"
+										opened={medicineForm.errors.medicine_dosage_id}
+									>
 										<Select
-											clearable
 											searchable
-											filter={medicineOptionsFilter}
-											onSearchChange={setMedicineTerm}
-											id="medicine_id"
-											name="medicine_id"
-											data={medicineData?.map((item) => ({
-												label: item.product_name,
-												value: item.product_id?.toString(),
-												generic: item.generic || "",
-											}))}
-											value={medicineForm.values.medicine_id}
-											onChange={(v) => handleChange("medicine_id", v)}
-											placeholder={t("Medicine")}
-											tooltip="Select medicine"
-											nothingFoundMessage="Type to find medicine..."
-											classNames={inputCss}
-											error={!!medicineForm.errors.medicine_id}
-										/>
-									</FormValidatorWrapper>
-								</Grid.Col>
-								<Grid.Col span={6}>
-									<FormValidatorWrapper opened={medicineForm.errors.generic}>
-										<Autocomplete
-											tooltip={t("EnterGenericName")}
-											id="generic"
-											name="generic"
 											clearable
-											data={medicineGenericData?.map((item, index) => ({
-												label: item?.name || item?.product_name,
-												value: `${item.name} ${index}`,
-												generic: item?.generic || "",
-											}))}
-											filter={medicineOptionsFilter}
-											value={medicineForm.values.generic}
-											onChange={(v) => {
-												handleChange("generic", v);
-												setMedicineGenericTerm(v);
-											}}
-											placeholder={t("GenericName")}
+											searchValue={medicineDosageSearchValue}
+											onSearchChange={setMedicineDosageSearchValue}
 											classNames={inputCss}
-											error={!!medicineForm.errors.generic}
+											id="medicine_dosage_id"
+											name="medicine_dosage_id"
+											data={dosage_options?.map((dosage) => ({
+												value: dosage.id?.toString(),
+												label: dosage.name,
+											}))}
+											value={medicineForm.values.medicine_dosage_id}
+											placeholder={t("Dosage")}
+											tooltip={t("EnterDosage")}
+											onChange={(v) => handleChange("medicine_dosage_id", v)}
+											error={!!medicineForm.errors.medicine_dosage_id}
 										/>
 									</FormValidatorWrapper>
-								</Grid.Col>
-							</Grid>
-							<Grid w="100%" columns={12} gutter="3xs">
-								<Grid.Col span={10}>
-									<Group grow gap="les">
-										<FormValidatorWrapper
-											position="bottom-end"
-											opened={medicineForm.errors.medicine_dosage_id}
-										>
-											<Select
-												searchable
-												clearable
-												searchValue={medicineDosageSearchValue}
-												onSearchChange={setMedicineDosageSearchValue}
-												classNames={inputCss}
-												id="medicine_dosage_id"
-												name="medicine_dosage_id"
-												data={dosage_options?.map((dosage) => ({
-													value: dosage.id?.toString(),
-													label: dosage.name,
-												}))}
-												value={medicineForm.values.medicine_dosage_id}
-												placeholder={t("Dosage")}
-												tooltip={t("EnterDosage")}
-												onChange={(v) => handleChange("medicine_dosage_id", v)}
-												error={!!medicineForm.errors.medicine_dosage_id}
-											/>
-										</FormValidatorWrapper>
-										<FormValidatorWrapper
-											position="bottom-end"
-											opened={medicineForm.errors.medicine_bymeal_id}
-										>
-											<Select
-												searchable
-												clearable
-												searchValue={medicineByMealSearchValue}
-												onSearchChange={setMedicineByMealSearchValue}
-												classNames={inputCss}
-												id="medicine_bymeal_id"
-												name="medicine_bymeal_id"
-												data={by_meal_options?.map((byMeal) => ({
-													value: byMeal.id?.toString(),
-													label: byMeal.name,
-												}))}
-												value={medicineForm.values.medicine_bymeal_id}
-												placeholder={t("ByMeal")}
-												tooltip={t("EnterWhenToTakeMedicine")}
-												onChange={(v) => handleChange("medicine_bymeal_id", v)}
-												error={!!medicineForm.errors.medicine_bymeal_id}
-											/>
-										</FormValidatorWrapper>
-									</Group>
-								</Grid.Col>
-								<Grid.Col span={2}>
-									<Group grow gap="les">
-										<Button
-											leftSection={<IconPlus size={16} />}
-											type="submit"
-											variant="filled"
-											bg="var(--theme-secondary-color-6)"
-											size="compact-md"
-										>
-											{t("Add")}
-										</Button>
-									</Group>
-								</Grid.Col>
-							</Grid>
-						</Group>
+									<FormValidatorWrapper
+										position="bottom-end"
+										opened={medicineForm.errors.medicine_bymeal_id}
+									>
+										<Select
+											searchable
+											clearable
+											searchValue={medicineByMealSearchValue}
+											onSearchChange={setMedicineByMealSearchValue}
+											classNames={inputCss}
+											id="medicine_bymeal_id"
+											name="medicine_bymeal_id"
+											data={by_meal_options?.map((byMeal) => ({
+												value: byMeal.id?.toString(),
+												label: byMeal.name,
+											}))}
+											value={medicineForm.values.medicine_bymeal_id}
+											placeholder={t("ByMeal")}
+											tooltip={t("EnterWhenToTakeMedicine")}
+											onChange={(v) => handleChange("medicine_bymeal_id", v)}
+											error={!!medicineForm.errors.medicine_bymeal_id}
+										/>
+									</FormValidatorWrapper>
+								</Group>
+							</Grid.Col>
+							<Grid.Col span={1}>
+								<ActionIcon
+									type="submit"
+									variant="filled"
+									h="34px"
+									w="100%"
+									color="var(--theme-secondary-color-6)"
+								>
+									<IconPlus size={16} />
+								</ActionIcon>
+							</Grid.Col>
+						</Grid>
 					</Grid.Col>
-					<Grid.Col span={6} bg="var(--mantine-color-white)">
+					<Grid.Col span={10}>
 						<Grid w="100%" columns={12} gutter="3xs">
 							<Grid.Col span={12}>
 								<Group grow gap="les">
@@ -630,8 +626,8 @@ export default function AddMedicineForm({
 								<Button
 									leftSection={<IconPlus size={16} />}
 									w="100%"
-									size="xs"
 									type="button"
+									bg="white"
 									variant="outline"
 									color="green"
 									onClick={openDosageForm}
@@ -642,8 +638,8 @@ export default function AddMedicineForm({
 							<Grid.Col span={6}>
 								<Button
 									w="100%"
-									size="xs"
 									type="button"
+									bg="white"
 									variant="outline"
 									color="red"
 									onClick={openExPrescription}
@@ -682,13 +678,13 @@ export default function AddMedicineForm({
 				</Flex>
 			</Flex>
 			<ScrollArea
-				h={baseHeight ? baseHeight : form.values.instruction ? mainAreaHeight - 420 - 50 : mainAreaHeight - 420}
+				h={baseHeight ? baseHeight : form.values.instruction ? mainAreaHeight - 380 - 50 : mainAreaHeight - 380}
 				bg="var(--mantine-color-white)"
 			>
 				<Stack gap="2px" p="sm">
 					{medicines?.length === 0 && form.values.exEmergency?.length === 0 && (
 						<Flex
-							mih={baseHeight ? baseHeight - 50 : 220}
+							mih={baseHeight ? baseHeight - 50 : 260}
 							gap="md"
 							justify="center"
 							align="center"

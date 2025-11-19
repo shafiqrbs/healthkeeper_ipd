@@ -183,7 +183,7 @@ export default function VitalsChart({ data, refetch }) {
 				</Text>
 			</Group>
 
-			<Box
+			{/* <Box
 				bg="var(--theme-secondary-color-0)"
 				p="xs"
 				component="form"
@@ -314,7 +314,7 @@ export default function VitalsChart({ data, refetch }) {
 						Add
 					</Button>
 				</Flex>
-			</Box>
+			</Box> */}
 
 			<DataTable
 				striped

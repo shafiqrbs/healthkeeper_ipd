@@ -5,7 +5,15 @@ import tabClass from "@assets/css/Tab.module.css";
 
 const DEFAULT_ACTIVE_COLOR = "var(--theme-primary-color-6)";
 
-export default function BaseTabs({ tabWidth = "32%", width, expand = true, tabList, tabValue, setTabValue }) {
+export default function BaseTabs({
+	tabHandler,
+	tabWidth = "32%",
+	width,
+	expand = true,
+	tabList,
+	tabValue,
+	setTabValue,
+}) {
 	const { t } = useTranslation();
 	const [rootRef, setRootRef] = useState(null);
 
@@ -38,6 +46,7 @@ export default function BaseTabs({ tabWidth = "32%", width, expand = true, tabLi
 								<>
 									{tabList.map((tab) => (
 										<Tabs.Tab
+											onClick={tabHandler}
 											w={tabWidth}
 											key={tab}
 											value={tab}

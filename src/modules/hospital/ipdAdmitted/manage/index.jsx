@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { getPrescriptionFormInitialValues } from "../helpers/request";
 import { useForm } from "@mantine/form";
 import { Box, Flex, Grid, LoadingOverlay, ScrollArea, Stack, Text, Drawer, ActionIcon } from "@mantine/core";
-import { IconDirectionSign } from "@tabler/icons-react";
+import { IconDirectionSign, IconReportMedical } from "@tabler/icons-react";
 import PatientReport from "@hospital-components/PatientReport";
 import AddMedicineForm from "../common/AddMedicineForm";
 import BaseTabs from "@components/tabs/BaseTabs";
@@ -34,7 +34,9 @@ export default function Index() {
 	const { mainAreaHeight } = useOutletContext();
 	const { id } = useParams();
 	const [opened, { close }] = useDisclosure(false);
-	const [drawerOpened, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
+	const [navigationDrawerOpened, { open: openNavigationDrawer, close: closeNavigationDrawer }] = useDisclosure(false);
+	const [patientReportDrawerOpened, { open: openPatientReportDrawer, close: closePatientReportDrawer }] =
+		useDisclosure(false);
 	const [showHistory, setShowHistory] = useState(false);
 	const [medicines, setMedicines] = useState([]);
 	const { t } = useTranslation();
@@ -59,18 +61,21 @@ export default function Index() {
 		url: `${HOSPITAL_DATA_ROUTES.API_ROUTES.IPD.INDEX}/${id}`,
 	});
 
-	const initialFormValues = JSON.parse(prescriptionData?.data?.json_content || "{}");
-	const existingMedicines = prescriptionData?.data?.prescription_medicine || [];
+	const initialFormValues = useMemo(
+		() => JSON.parse(prescriptionData?.data?.json_content || "{}"),
+		[prescriptionData]
+	);
+	const existingMedicines = useMemo(() => prescriptionData?.data?.prescription_medicine || [], [prescriptionData]);
 
 	const form = useForm(getPrescriptionFormInitialValues(t, {}));
 
 	useEffect(() => {
-		// Always reset the form when prescription data changes
+		// =============== always reset the form when prescription data changes ===============
 		const updatedFormValues = getPrescriptionFormInitialValues(t, initialFormValues);
 		form.setValues(updatedFormValues.initialValues);
 		setMedicines(existingMedicines || []);
 		setRecords(prescriptionData?.data?.prescription_medicine_history || []);
-	}, [prescriptionData]);
+	}, [prescriptionData, initialFormValues, existingMedicines]);
 
 	useEffect(() => {
 		const tab = searchParams.get("tab");
@@ -78,6 +83,14 @@ export default function Index() {
 			setBaseTabValue(tab?.toLowerCase());
 		}
 	}, [searchParams]);
+
+	useEffect(() => {
+		if (baseTabValue === "e-fresh") {
+			openPatientReportDrawer();
+		} else {
+			closePatientReportDrawer();
+		}
+	}, [baseTabValue, openPatientReportDrawer, closePatientReportDrawer]);
 
 	const handleTabClick = async (tabItem) => {
 		if (tabItem === "E-Fresh") {
@@ -107,11 +120,31 @@ export default function Index() {
 	return (
 		<Box pos="relative">
 			<LoadingOverlay visible={isLoading} overlayProps={{ radius: "sm", blur: 2 }} />
-			{/* =============== floating menu button on left side middle =============== */}
+
+			{baseTabValue === "e-fresh" && (
+				<ActionIcon
+					variant="outline"
+					size="xl"
+					onClick={openPatientReportDrawer}
+					pos="fixed"
+					left={0}
+					bg="var(--mantine-color-white)"
+					top="41%"
+					color="var(--mantine-color-green-6)"
+					style={{
+						transform: "translateY(-50%)",
+						zIndex: 11,
+						boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+					}}
+				>
+					<IconReportMedical stroke={1.7} size={28} />
+				</ActionIcon>
+			)}
+
 			<ActionIcon
 				variant="outline"
 				size="xl"
-				onClick={openDrawer}
+				onClick={openNavigationDrawer}
 				pos="fixed"
 				left={0}
 				bg="var(--mantine-color-white)"
@@ -124,10 +157,10 @@ export default function Index() {
 			>
 				<IconDirectionSign stroke={1.7} size={28} />
 			</ActionIcon>
-			{/* =============== drawer for patient info and tabs =============== */}
+
 			<Drawer
-				opened={drawerOpened}
-				onClose={closeDrawer}
+				opened={navigationDrawerOpened}
+				onClose={closeNavigationDrawer}
 				position="left"
 				title={t("PatientInformation")}
 				padding="md"
@@ -176,7 +209,7 @@ export default function Index() {
 									variant="default"
 									onClick={() => {
 										handleTabClick(tabItem);
-										closeDrawer();
+										closeNavigationDrawer();
 									}}
 									bg={
 										baseTabValue === tabItem?.toLowerCase()
@@ -203,26 +236,39 @@ export default function Index() {
 					</ScrollArea>
 				</Box>
 			</Drawer>
+			{/*
+				=============== drawer for e-fresh patient report ===============
+			*/}
+			<Drawer
+				opened={patientReportDrawerOpened}
+				onClose={closePatientReportDrawer}
+				position="left"
+				title={t("PatientReport")}
+				padding="md"
+				size="lg"
+			>
+				<Stack gap="3xs" h={mainAreaHeight}>
+					<BaseTabs
+						tabHandler={openPatientReportDrawer}
+						tabValue={tabValue}
+						setTabValue={setTabValue}
+						tabList={["All", ...(tabList?.length > 0 ? tabList : ["No data"])]}
+					/>
+					<PatientReport
+						// extraHeight={246}
+						tabValue={tabValue}
+						form={form}
+						prescriptionData={prescriptionData}
+						modeName="E-Fresh Order"
+					/>
+				</Stack>
+			</Drawer>
 			<Flex w="100%" gap="xs" p="16px">
 				<Grid w="100%" columns={24} gutter="xs">
 					<Grid.Col w="100%" span={24}>
 						{baseTabValue === "e-fresh" && (
 							<Stack w="100%" gap={0}>
-								<BaseTabs
-									tabValue={tabValue}
-									setTabValue={setTabValue}
-									tabList={["All", ...(tabList?.length > 0 ? tabList : ["No data"])]}
-								/>
 								<Flex gap="xs" w="100%">
-									<Box w="40%">
-										<PatientReport
-											extraHeight={246}
-											tabValue={tabValue}
-											form={form}
-											prescriptionData={prescriptionData}
-											modeName="E-Fresh Order"
-										/>
-									</Box>
 									<AddMedicineForm
 										module={module}
 										form={form}

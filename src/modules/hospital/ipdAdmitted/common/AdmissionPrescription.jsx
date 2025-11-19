@@ -74,8 +74,6 @@ export default function AdmissionPrescription() {
 
 	const hasRecords = records && records.length > 0;
 
-
-
 	return (
 		<Box pos="relative">
 			<LoadingOverlay visible={isLoading} overlayProps={{ radius: "sm", blur: 2 }} />
