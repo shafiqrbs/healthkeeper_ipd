@@ -1542,5 +1542,6 @@
 	"ListOfMedicines": "List of Medicines",
 	"RelationWithPatient": "Relation with Patient",
 	"QuantityCannotBeGreaterThanOpdQuantity": "Quantity cannot be greater than opd quantity",
-	"AreYouSureYouWantCreateAE-FreshPrescription": "Are you sure you want to create a new e-fresh prescription?"
+	"AreYouSureYouWantCreateAE-FreshPrescription": "Are you sure you want to create a new e-fresh prescription?",
+	"AdmittedList": "Admitted List"
 }

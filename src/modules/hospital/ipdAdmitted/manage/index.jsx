@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { getPrescriptionFormInitialValues } from "../helpers/request";
 import { useForm } from "@mantine/form";
-import { Box, Flex, Grid, LoadingOverlay, ScrollArea, Stack, Text } from "@mantine/core";
+import { Box, Flex, Grid, LoadingOverlay, ScrollArea, Stack, Text, Drawer, ActionIcon } from "@mantine/core";
+import { IconDirectionSign } from "@tabler/icons-react";
 import PatientReport from "@hospital-components/PatientReport";
 import AddMedicineForm from "../common/AddMedicineForm";
 import BaseTabs from "@components/tabs/BaseTabs";
@@ -14,27 +15,26 @@ import useDataWithoutStore from "@hooks/useDataWithoutStore";
 import PatientPrescriptionHistoryList from "@hospital-components/PatientPrescriptionHistoryList";
 import { getDataWithoutStore } from "@/services/apiService";
 import DetailsDrawer from "@/modules/hospital/common/drawer/__IPDDetailsDrawer";
-import { useOutletContext, useParams, useSearchParams } from "react-router-dom";
-import Navigation from "@components/layout/Navigation";
-import Medicine from "@modules/hospital/ipdAdmitted/common/tabs/Medicine";
+import { useNavigate, useOutletContext, useParams, useSearchParams } from "react-router-dom";
 import Investigation from "@modules/hospital/ipdAdmitted/common/tabs/Investigation";
 import { modals } from "@mantine/modals";
 import { formatDate } from "@utils/index";
 import VitalsChart from "../common/tabs/VitalsChart";
 import InsulinChart from "../common/tabs/InsulinChart";
 import Dashboard from "../common/tabs/Dashboard";
-import Discharge from "../common/tabs/Discharge";
 
 const module = MODULES.E_FRESH;
 
 const TAB_ITEMS = ["Dashboard", "E-Fresh", "Investigation", "Vitals Chart", "Insulin Chart"];
 
 export default function Index() {
+	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [records, setRecords] = useState([]);
 	const { mainAreaHeight } = useOutletContext();
 	const { id } = useParams();
 	const [opened, { close }] = useDisclosure(false);
+	const [drawerOpened, { open: openDrawer, close: closeDrawer }] = useDisclosure(false);
 	const [showHistory, setShowHistory] = useState(false);
 	const [medicines, setMedicines] = useState([]);
 	const { t } = useTranslation();
@@ -107,69 +107,105 @@ export default function Index() {
 	return (
 		<Box pos="relative">
 			<LoadingOverlay visible={isLoading} overlayProps={{ radius: "sm", blur: 2 }} />
+			{/* =============== floating menu button on left side middle =============== */}
+			<ActionIcon
+				variant="outline"
+				size="xl"
+				onClick={openDrawer}
+				pos="fixed"
+				left={0}
+				bg="var(--mantine-color-white)"
+				top="50%"
+				style={{
+					transform: "translateY(-50%)",
+					zIndex: 10,
+					boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+				}}
+			>
+				<IconDirectionSign stroke={1.7} size={28} />
+			</ActionIcon>
+			{/* =============== drawer for patient info and tabs =============== */}
+			<Drawer
+				opened={drawerOpened}
+				onClose={closeDrawer}
+				position="left"
+				title={t("PatientInformation")}
+				padding="md"
+				size="md"
+			>
+				<Box style={{ overflow: "hidden" }}>
+					<Box mb="xs" bg="var(--theme-primary-color-1)">
+						<Box p="xs" bg="var(--theme-primary-color-0)">
+							<Text fz="xs">{prescriptionData?.data?.patient_id}</Text>
+							<Text fz="xs">{prescriptionData?.data?.health_id || ""}</Text>
+							<Text fz="sm" fw={600}>
+								{prescriptionData?.data?.name}
+							</Text>
+							<Text fz="xs">{prescriptionData?.data?.gender}</Text>
+							<Text fz="xs">
+								{prescriptionData?.data?.year || 0}y {prescriptionData?.data?.month || 0}m{" "}
+								{prescriptionData?.data?.day || 0}d{" "}
+							</Text>
+							<Text fz="xs">
+								{t("Created")} {formatDate(prescriptionData?.data?.created_at)}
+							</Text>
+						</Box>
+					</Box>
+					<ScrollArea h={mainAreaHeight - 200} scrollbars="y">
+						<Stack bg="var(--mantine-color-white)" h="100%" py="xs" gap={0}>
+							<Box
+								mt={-12}
+								mx={8}
+								mb={4}
+								className={`cursor-pointer`}
+								variant="default"
+								onClick={() => {
+									navigate(`${HOSPITAL_DATA_ROUTES.NAVIGATION_LINKS.IPD_ADMITTED.VIEW}`);
+								}}
+								bg={"var(--mantine-color-white)"}
+							>
+								<Text c="var(--mantine-color-black)" size="sm" py="3xs" pl="3xs" fw={500}>
+									{t("AdmittedList")}
+								</Text>
+							</Box>
+							{TAB_ITEMS.map((tabItem, index) => (
+								<Box
+									key={index}
+									mx={8}
+									className={`cursor-pointer`}
+									variant="default"
+									onClick={() => {
+										handleTabClick(tabItem);
+										closeDrawer();
+									}}
+									bg={
+										baseTabValue === tabItem?.toLowerCase()
+											? "var(--mantine-color-gray-1)"
+											: "var(--mantine-color-white)"
+									}
+								>
+									<Text
+										c={
+											baseTabValue === tabItem?.toLowerCase()
+												? "var(--theme-primary-color-8)"
+												: "var(--mantine-color-black)"
+										}
+										size="sm"
+										py="3xs"
+										pl="3xs"
+										fw={500}
+									>
+										{t(tabItem)}
+									</Text>
+								</Box>
+							))}
+						</Stack>
+					</ScrollArea>
+				</Box>
+			</Drawer>
 			<Flex w="100%" gap="xs" p="16px">
 				<Grid w="100%" columns={24} gutter="xs">
-					<Grid.Col pos="sticky" top={52} span={6} h="fit-content" style={{ alignSelf: "flex-start" }}>
-						<Box style={{ overflow: "hidden" }} h={mainAreaHeight - 14}>
-							<Box mb="xs" bg="var(--theme-primary-color-1)">
-								<Box
-									bg="var(--theme-primary-color-1)"
-									style={{ borderBottom: "1px solid var(--mantine-color-white)" }}
-									p="xs"
-								>
-									{t("PatientInformation")}
-								</Box>
-								<Box p="xs" bg="var(--theme-primary-color-0)">
-									<Text fz="xs">{prescriptionData?.data?.patient_id}</Text>
-									<Text fz="xs">{prescriptionData?.data?.health_id || ""}</Text>
-									<Text fz="sm" fw={600}>
-										{prescriptionData?.data?.name}
-									</Text>
-									<Text fz="xs">{prescriptionData?.data?.gender}</Text>
-									<Text fz="xs">
-										{prescriptionData?.data?.year || 0}y {prescriptionData?.data?.month || 0}m{" "}
-										{prescriptionData?.data?.day || 0}d{" "}
-									</Text>
-									<Text fz="xs">
-										{t("Created")} {formatDate(prescriptionData?.data?.created_at)}
-									</Text>
-								</Box>
-							</Box>
-							<ScrollArea h={mainAreaHeight - 80} scrollbars="y">
-								<Stack bg="var(--mantine-color-white)" h="100%" py="xs" gap={0}>
-									{TAB_ITEMS.map((tabItem, index) => (
-										<Box
-											key={index}
-											mx={8}
-											className={`cursor-pointer`}
-											variant="default"
-											onClick={() => handleTabClick(tabItem)}
-											bg={
-												baseTabValue === tabItem?.toLowerCase()
-													? "var(--mantine-color-gray-1)"
-													: "var(--mantine-color-white)"
-											}
-										>
-											<Text
-												c={
-													baseTabValue === tabItem?.toLowerCase()
-														? "var(--theme-primary-color-8)"
-														: "var(--mantine-color-black)"
-												}
-												size="sm"
-												py="3xs"
-												pl="3xs"
-												fw={500}
-											>
-												{t(tabItem)}
-											</Text>
-										</Box>
-									))}
-								</Stack>
-							</ScrollArea>
-						</Box>
-					</Grid.Col>
-					<Grid.Col w="100%" span={18}>
+					<Grid.Col w="100%" span={24}>
 						{baseTabValue === "e-fresh" && (
 							<Stack w="100%" gap={0}>
 								<BaseTabs
