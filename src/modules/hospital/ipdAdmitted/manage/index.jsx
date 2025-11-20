@@ -275,9 +275,9 @@ export default function Index() {
 										medicines={medicines || []}
 										hasRecords={hasRecords}
 										setMedicines={setMedicines}
-										setShowHistory={setShowHistory}
 										prescriptionData={prescriptionData}
 										tabParticulars={tabParticulars}
+										records={records}
 									/>
 								</Flex>
 							</Stack>

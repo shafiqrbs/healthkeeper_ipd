@@ -14,6 +14,7 @@ import {
 	Tooltip,
 	ActionIcon,
 	Textarea,
+	Drawer,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import {
@@ -28,6 +29,7 @@ import {
 	IconTrash,
 	IconCaretUpDownFilled,
 	IconMedicineSyrup,
+	IconAdjustmentsHorizontal,
 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import { getMedicineFormInitialValues } from "../helpers/request";
@@ -49,6 +51,7 @@ import inputCss from "@assets/css/InputField.module.css";
 import ReferredPrescriptionDetailsDrawer from "@modules/hospital/visit/__RefrerredPrescriptionDetailsDrawer";
 import GlobalDrawer from "@components/drawers/GlobalDrawer";
 import CreateDosageDrawer from "@hospital-components/drawer/CreateDosageDrawer";
+import PatientPrescriptionHistoryList from "@hospital-components/PatientPrescriptionHistoryList";
 import { PHARMACY_DROPDOWNS } from "@/app/store/core/utilitySlice";
 import { useNavigate } from "react-router-dom";
 import DetailsDrawer from "@hospital-components/drawer/__DetailsDrawer";
@@ -68,10 +71,10 @@ export default function AddMedicineForm({
 	medicines,
 	setMedicines,
 	baseHeight,
-	setShowHistory,
 	prescriptionData,
 	hasRecords,
 	tabParticulars,
+	records,
 }) {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
@@ -96,6 +99,8 @@ export default function AddMedicineForm({
 	const [openedExPrescription, { open: openExPrescription, close: closeExPrescription }] = useDisclosure(false);
 	const [openedPrescriptionPreview, { open: openPrescriptionPreview, close: closePrescriptionPreview }] =
 		useDisclosure(false);
+	const [openedTreatmentDrawer, { open: openTreatmentDrawer, close: closeTreatmentDrawer }] = useDisclosure(false);
+	const [openedHistoryDrawer, { open: openHistoryDrawer, close: closeHistoryDrawer }] = useDisclosure(false);
 	// =============== autocomplete state for emergency prescription ================
 	const [autocompleteValue, setAutocompleteValue] = useState("");
 	const [tempEmergencyItems, setTempEmergencyItems] = useState([]);
@@ -473,15 +478,33 @@ export default function AddMedicineForm({
 	};
 
 	return (
-		<Box className="borderRadiusAll" bg="var(--mantine-color-white)">
+		<Box w="100%" className="borderRadiusAll" bg="var(--mantine-color-white)" pos="relative">
+			{/* =============== floating treatment drawer toggle button on right side =============== */}
+			<ActionIcon
+				variant="outline"
+				size="xl"
+				onClick={openTreatmentDrawer}
+				pos="fixed"
+				right={0}
+				bg="var(--mantine-color-white)"
+				top="48%"
+				style={{
+					transform: "translateY(-50%)",
+					zIndex: 10,
+					boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)",
+				}}
+			>
+				<IconAdjustmentsHorizontal stroke={1.7} size={28} />
+			</ActionIcon>
 			<Box
 				onSubmit={medicineForm.onSubmit(handleAdd)}
 				key={updateKey}
 				component="form"
 				bg="var(--theme-secondary-color-0)"
 				p="sm"
+				w="100%"
 			>
-				<Grid w="100%" columns={24} gutter="3xs">
+				<Grid w="100%" columns={14} gutter="3xs">
 					<Grid.Col span={14}>
 						<Grid w="100%" columns={10} gutter="3xs">
 							<Grid.Col span={5}>
@@ -597,58 +620,6 @@ export default function AddMedicineForm({
 							</Grid.Col>
 						</Grid>
 					</Grid.Col>
-					<Grid.Col span={10}>
-						<Grid w="100%" columns={12} gutter="3xs">
-							<Grid.Col span={12}>
-								<Group grow gap="les">
-									<SelectForm
-										form={medicineForm}
-										label=""
-										id="treatments"
-										name="treatments"
-										dropdownValue={treatmentData?.data?.map((item) => ({
-											label: item.name,
-											value: item.id?.toString(),
-										}))}
-										value={medicineForm.values.treatments}
-										placeholder={t("TreatmentTemplate")}
-										required
-										tooltip={t("TreatmentTemplate")}
-										withCheckIcon={false}
-										changeValue={populateMedicineData}
-									/>
-									<InputForm form={form} name="weight" placeholder={t("Weight/KG")} />
-								</Group>
-							</Grid.Col>
-						</Grid>
-						<Grid w="100%" columns={12} gutter="3xs">
-							<Grid.Col span={6}>
-								<Button
-									leftSection={<IconPlus size={16} />}
-									w="100%"
-									type="button"
-									bg="white"
-									variant="outline"
-									color="green"
-									onClick={openDosageForm}
-								>
-									{t("Dosage")}
-								</Button>
-							</Grid.Col>
-							<Grid.Col span={6}>
-								<Button
-									w="100%"
-									type="button"
-									bg="white"
-									variant="outline"
-									color="red"
-									onClick={openExPrescription}
-								>
-									{t("Extra")}
-								</Button>
-							</Grid.Col>
-						</Grid>
-					</Grid.Col>
 				</Grid>
 			</Box>
 			<Flex bg="var(--theme-primary-color-0)" mb="les" justify="space-between" align="center" py="les" mt="xs">
@@ -667,7 +638,7 @@ export default function AddMedicineForm({
 						<Tooltip label="History">
 							<Button
 								variant="filled"
-								onClick={() => setShowHistory((prev) => !prev)}
+								onClick={openHistoryDrawer}
 								leftSection={<IconHistory size={14} />}
 								rightSection={<IconArrowRight size={14} />}
 							>
@@ -970,6 +941,85 @@ export default function AddMedicineForm({
 			<ReferredPrescriptionDetailsDrawer opened={opened} close={close} prescriptionData={prescriptionData} />
 
 			<CreateDosageDrawer opened={openedDosageForm} close={closeDosageForm} />
+
+			{/* =============== drawer for treatment template and actions =============== */}
+			<Drawer
+				opened={openedTreatmentDrawer}
+				onClose={closeTreatmentDrawer}
+				position="right"
+				title={t("TreatmentOptions")}
+				padding="md"
+				size="md"
+			>
+				<Stack gap="md">
+					<Grid w="100%" columns={12} gutter="3xs">
+						<Grid.Col span={12}>
+							<SelectForm
+								form={medicineForm}
+								label=""
+								id="treatments"
+								name="treatments"
+								dropdownValue={treatmentData?.data?.map((item) => ({
+									label: item.name,
+									value: item.id?.toString(),
+								}))}
+								value={medicineForm.values.treatments}
+								placeholder={t("TreatmentTemplate")}
+								required
+								tooltip={t("TreatmentTemplate")}
+								withCheckIcon={false}
+								changeValue={populateMedicineData}
+							/>
+							<InputForm mt="sm" form={form} name="weight" placeholder={t("Weight/KG")} />
+						</Grid.Col>
+					</Grid>
+					<Grid w="100%" columns={12} gutter="3xs">
+						<Grid.Col span={6}>
+							<Button
+								leftSection={<IconPlus size={16} />}
+								w="100%"
+								type="button"
+								bg="white"
+								variant="outline"
+								color="green"
+								onClick={() => {
+									openDosageForm();
+									closeTreatmentDrawer();
+								}}
+							>
+								{t("Dosage")}
+							</Button>
+						</Grid.Col>
+						<Grid.Col span={6}>
+							<Button
+								w="100%"
+								type="button"
+								bg="white"
+								variant="outline"
+								color="red"
+								onClick={() => {
+									openExPrescription();
+									closeTreatmentDrawer();
+								}}
+							>
+								{t("Extra")}
+							</Button>
+						</Grid.Col>
+					</Grid>
+				</Stack>
+			</Drawer>
+
+			{/* =============== drawer for prescription history =============== */}
+			<Drawer
+				opened={openedHistoryDrawer}
+				onClose={closeHistoryDrawer}
+				position="right"
+				title={t("PrescriptionHistory")}
+				padding="md"
+				size="md"
+			>
+				<PatientPrescriptionHistoryList historyList={records || []} />
+			</Drawer>
 		</Box>
 	);
 }

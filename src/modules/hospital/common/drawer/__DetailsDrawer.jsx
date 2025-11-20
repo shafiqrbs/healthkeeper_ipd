@@ -48,7 +48,7 @@ export default function DetailsDrawer({ type = "prescription", opened, close, pr
 	const followUpDate = jsonContent?.follow_up_date;
 
 	return (
-		<GlobalDrawer opened={opened} close={close} title={t("PrescriptionDetails")} size="50%">
+		<GlobalDrawer opened={opened} close={close} title={t("PrescriptionDetails")} size="80%">
 			<Box pos="relative">
 				<LoadingOverlay visible={isLoading} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} />
 				<ScrollArea scrollbars="y" type="hover" h={mainAreaHeight - 110}>
