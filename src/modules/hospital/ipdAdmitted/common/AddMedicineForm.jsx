@@ -30,6 +30,7 @@ import {
 	IconCaretUpDownFilled,
 	IconMedicineSyrup,
 	IconAdjustmentsHorizontal,
+	IconHome,
 } from "@tabler/icons-react";
 import { useTranslation } from "react-i18next";
 import { getMedicineFormInitialValues } from "../helpers/request";
@@ -504,6 +505,23 @@ export default function AddMedicineForm({
 				p="sm"
 				w="100%"
 			>
+				<Grid w="100%" columns={24} mb="sm">
+					<Grid.Col fw={600} span={6} fz="sm">
+						{prescriptionData?.data?.name}
+					</Grid.Col>
+					<Grid.Col span={4} pt="sm" fz="xs" align={"right"}>
+						{prescriptionData?.data?.patient_id || "N/A"}
+					</Grid.Col>
+					<Grid.Col span={4} pt="sm" fz="xs">
+						{t("HID")} {prescriptionData?.data?.health_id || ""}
+					</Grid.Col>
+					<Grid.Col span={4} pt="sm" fz="xs" align={"right"}>
+						{prescriptionData?.data?.payment_mode_name}
+					</Grid.Col>
+					<Grid.Col span={6} pt="sm" fz="xs">
+						{prescriptionData?.data?.room_name}
+					</Grid.Col>
+				</Grid>
 				<Grid w="100%" columns={14} gutter="3xs">
 					<Grid.Col span={14}>
 						<Grid w="100%" columns={10} gutter="3xs">
@@ -556,8 +574,8 @@ export default function AddMedicineForm({
 								</FormValidatorWrapper>
 							</Grid.Col>
 						</Grid>
-						<Grid w="100%" columns={8} gutter="3xs">
-							<Grid.Col span={7}>
+						<Grid w="100%" columns={10} gutter="3xs">
+							<Grid.Col span={5}>
 								<Group grow gap="les">
 									<FormValidatorWrapper
 										position="bottom-end"
@@ -582,30 +600,32 @@ export default function AddMedicineForm({
 											error={!!medicineForm.errors.medicine_dosage_id}
 										/>
 									</FormValidatorWrapper>
-									<FormValidatorWrapper
-										position="bottom-end"
-										opened={medicineForm.errors.medicine_bymeal_id}
-									>
-										<Select
-											searchable
-											clearable
-											searchValue={medicineByMealSearchValue}
-											onSearchChange={setMedicineByMealSearchValue}
-											classNames={inputCss}
-											id="medicine_bymeal_id"
-											name="medicine_bymeal_id"
-											data={by_meal_options?.map((byMeal) => ({
-												value: byMeal.id?.toString(),
-												label: byMeal.name,
-											}))}
-											value={medicineForm.values.medicine_bymeal_id}
-											placeholder={t("ByMeal")}
-											tooltip={t("EnterWhenToTakeMedicine")}
-											onChange={(v) => handleChange("medicine_bymeal_id", v)}
-											error={!!medicineForm.errors.medicine_bymeal_id}
-										/>
-									</FormValidatorWrapper>
 								</Group>
+							</Grid.Col>
+							<Grid.Col span={4}>
+								<FormValidatorWrapper
+									position="bottom-end"
+									opened={medicineForm.errors.medicine_bymeal_id}
+								>
+									<Select
+										searchable
+										clearable
+										searchValue={medicineByMealSearchValue}
+										onSearchChange={setMedicineByMealSearchValue}
+										classNames={inputCss}
+										id="medicine_bymeal_id"
+										name="medicine_bymeal_id"
+										data={by_meal_options?.map((byMeal) => ({
+											value: byMeal.id?.toString(),
+											label: byMeal.name,
+										}))}
+										value={medicineForm.values.medicine_bymeal_id}
+										placeholder={t("ByMeal")}
+										tooltip={t("EnterWhenToTakeMedicine")}
+										onChange={(v) => handleChange("medicine_bymeal_id", v)}
+										error={!!medicineForm.errors.medicine_bymeal_id}
+									/>
+								</FormValidatorWrapper>
 							</Grid.Col>
 							<Grid.Col span={1}>
 								<ActionIcon
@@ -784,51 +804,18 @@ export default function AddMedicineForm({
 					</Grid>
 
 					{/* =================== submission button here =================== */}
-					<Button.Group bg="var(--theme-primary-color-0)" p="les">
-						<Button
-							w="100%"
-							bg="var(--theme-reset-btn-color)"
-							leftSection={<IconRestore size={16} />}
-							onClick={handleReset}
+					<Flex bg="var(--theme-primary-color-0)" p="xs" justify="space-between" gap="xs">
+						<ActionIcon
+							h="100%"
+							size="lg"
+							onClick={() => navigate("/hospital/ipd-admitted")}
+							variant="filled"
+							color="var(--theme-primary-color-6)"
 						>
-							<Stack gap={0} align="center" justify="center">
-								<Text>{t("Reset")}</Text>
-								<Text mt="-les" fz="xs" c="var(--theme-secondary-color)">
-									(alt + 1)
-								</Text>
-							</Stack>
-						</Button>
-
-						<Button w="100%" bg="var(--theme-hold-btn-color)" onClick={handleHoldData}>
-							<Stack gap={0} align="center" justify="center">
-								<Text>{t("Hold")}</Text>
-								<Text mt="-les" fz="xs" c="var(--theme-secondary-color)">
-									(alt + 2)
-								</Text>
-							</Stack>
-						</Button>
-						<Button w="100%" bg="var(--theme-error-color)" onClick={handlePrescriptionOverview}>
-							<Stack gap={0} align="center" justify="center">
-								<Text>{t("Preview")}</Text>
-								<Text mt="-les" fz="xs" c="var(--theme-secondary-color)">
-									(alt + 4)
-								</Text>
-							</Stack>
-						</Button>
-						{/* <Button
-							w="100%"
-							bg="var(--theme-prescription-btn-color)"
-							onClick={handlePrescriptionPrintSubmit}
-						>
-							<Stack gap={0} align="center" justify="center">
-								<Text>{t("Prescription")}</Text>
-								<Text mt="-les" fz="xs" c="var(--theme-secondary-color)">
-									(alt + 3)
-								</Text>
-							</Stack>
-						</Button> */}
+							<IconHome size={20} />
+						</ActionIcon>
 						<Button
-							w="100%"
+							w="140px"
 							bg="var(--theme-save-btn-color)"
 							onClick={openConfirmationModal}
 							loading={isSubmitting}
@@ -841,7 +828,7 @@ export default function AddMedicineForm({
 								</Text>
 							</Stack>
 						</Button>
-					</Button.Group>
+					</Flex>
 					{printData && <PrescriptionFullBN ref={prescription2A4Ref} data={printData} />}
 					{/* ----------- prescription preview ------------  */}
 					{/* <PrescriptionFull ref={prescriptionPrintRef} data={printPreviewPrescriptionData} /> */}

@@ -42,9 +42,6 @@ const Layout = () => {
 					<HomeIndex height={mainAreaHeight} />
 				)}
 			</AppShell.Main>
-			<AppShell.Footer height={footerHeight}>
-				<Footer />
-			</AppShell.Footer>
 		</AppShell>
 	);
 };

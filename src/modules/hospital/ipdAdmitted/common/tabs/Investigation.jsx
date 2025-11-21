@@ -221,7 +221,7 @@ export default function Investigation() {
 													{item.created}
 												</Badge>
 												<Box mt="es" fz="sm">
-													{item?.invoice_particular?.map((particular, idx) => (
+													{item?.items?.map((particular, idx) => (
 														<Flex key={idx} justify="space-between" align="center">
 															<Text fz="xs">
 																{idx + 1}. {particular.name}

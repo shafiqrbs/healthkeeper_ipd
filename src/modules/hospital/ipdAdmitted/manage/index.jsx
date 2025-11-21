@@ -84,14 +84,6 @@ export default function Index() {
 		}
 	}, [searchParams]);
 
-	useEffect(() => {
-		if (baseTabValue === "e-fresh") {
-			openPatientReportDrawer();
-		} else {
-			closePatientReportDrawer();
-		}
-	}, [baseTabValue, openPatientReportDrawer, closePatientReportDrawer]);
-
 	const handleTabClick = async (tabItem) => {
 		if (tabItem === "E-Fresh") {
 			modals.openConfirmModal({

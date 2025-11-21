@@ -1546,5 +1546,6 @@
 	"AdmittedList": "Admitted List",
 	"PatientReport": "Patient Report",
 	"TreatmentOptions": "Treatment Options",
-	"TreatmentTemplate": "Treatment Template"
+	"TreatmentTemplate": "Treatment Template",
+	"PrescriptionHistory": "Prescription History"
 }
