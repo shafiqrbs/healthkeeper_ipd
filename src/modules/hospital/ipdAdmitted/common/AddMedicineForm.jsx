@@ -505,21 +505,21 @@ export default function AddMedicineForm({
 				p="sm"
 				w="100%"
 			>
-				<Grid w="100%" columns={24} mb="sm">
+				<Grid w="100%" columns={12} mb="sm" gutter="les">
 					<Grid.Col fw={600} span={6} fz="sm">
 						{prescriptionData?.data?.name}
 					</Grid.Col>
-					<Grid.Col span={4} pt="sm" fz="xs" align={"right"}>
+					<Grid.Col span={6} pt="sm" fz="xs" align="right">
+						{prescriptionData?.data?.room_name}
+					</Grid.Col>
+					<Grid.Col span={6} fz="xs">
 						{prescriptionData?.data?.patient_id || "N/A"}
 					</Grid.Col>
-					<Grid.Col span={4} pt="sm" fz="xs">
-						{t("HID")} {prescriptionData?.data?.health_id || ""}
-					</Grid.Col>
-					<Grid.Col span={4} pt="sm" fz="xs" align={"right"}>
-						{prescriptionData?.data?.payment_mode_name}
-					</Grid.Col>
-					<Grid.Col span={6} pt="sm" fz="xs">
-						{prescriptionData?.data?.room_name}
+					<Grid.Col span={6} fz="xs" align={"right"}>
+						{t("HID")}: {prescriptionData?.data?.health_id || "N/A"}
+						<Box component="span" display="inline-block" ml="sm">
+							{t("Mode")}: {prescriptionData?.data?.payment_mode_name}
+						</Box>
 					</Grid.Col>
 				</Grid>
 				<Grid w="100%" columns={14} gutter="3xs">
@@ -669,7 +669,7 @@ export default function AddMedicineForm({
 				</Flex>
 			</Flex>
 			<ScrollArea
-				h={baseHeight ? baseHeight : form.values.instruction ? mainAreaHeight - 380 - 50 : mainAreaHeight - 380}
+				h={baseHeight ? baseHeight : form.values.instruction ? mainAreaHeight - 420 - 50 : mainAreaHeight - 420}
 				bg="var(--mantine-color-white)"
 			>
 				<Stack gap="2px" p="sm">
